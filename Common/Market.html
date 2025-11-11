@@ -854,7 +854,7 @@
           tr.className = 'relatedtr';
           tr.style.cursor = 'pointer';
           tr.onclick = () => {
-            window.location.href = `/Common/market.html?id=${event.marketId}`;
+            window.location.href = `/Common/Market.html?id=${event.marketId}`;
           };
 
           tr.innerHTML = `
@@ -938,7 +938,7 @@
           // ✅ Redirect on click to market.html with marketId
           li.style.cursor = 'pointer';
           li.addEventListener('click', () => {
-            window.location.href = `/Common/market.html?id=${match.marketId}`;
+            window.location.href = `/Common/Market.html?id=${match.marketId}`;
           });
 
           listContainer.appendChild(li);
@@ -981,7 +981,7 @@
           li.style.cursor = 'pointer';  // Cursor pointer for UX
           li.addEventListener('click', () => {
             // MarketId ko query param mein bhej rahe hain
-            window.location.href = `market.html?id=${encodeURIComponent(match.marketId)}`;
+            window.location.href = `Market.html?id=${encodeURIComponent(match.marketId)}`;
           });
 
           listContainer.appendChild(li);
@@ -1092,7 +1092,7 @@ setTimeout(() => {
   if (matchLink) {
     matchLink.addEventListener('click', (e) => {
       e.stopPropagation(); // prevent parent events
-      window.location.href = `/Common/market.html?id=${match.marketId}`;
+      window.location.href = `/Common/Market.html?id=${match.marketId}`;
     });
   }
 }, 0);
@@ -1186,7 +1186,7 @@ tbody.appendChild(row);
             <td class="action"><a href="#"><i class="fa fa-info-circle"></i></a></td>
           `;
            row.addEventListener('click', function() {
-              window.location.href = `market.html?id=${match.marketId}`;
+              window.location.href = `Market.html?id=${match.marketId}`;
             });
           tbody.appendChild(row);
         });
@@ -1243,7 +1243,7 @@ tbody.appendChild(row);
 
           // ✅ Redirect on click
           li.addEventListener('click', () => {
-            window.location.href = `/Common/market.html?id=${matchId}`;
+            window.location.href = `/Common/Market.html?id=${matchId}`;
           });
 
           listContainer.appendChild(li);
@@ -1292,7 +1292,7 @@ tbody.appendChild(row);
 
           // ✅ Redirect on click to market.html with id
           li.addEventListener('click', () => {
-            window.location.href = `/Common/market.html?id=${matchId}`;
+            window.location.href = `/Common/Market.html?id=${matchId}`;
           });
 
           listContainer.appendChild(li);
@@ -1343,7 +1343,7 @@ tbody.appendChild(row);
           li.style.cursor = 'pointer';
 
           li.addEventListener('click', () => {
-            window.location.href = `/Common/market.html?id=${matchId}`;
+            window.location.href = `/Common/Market.html?id=${matchId}`;
           });
 
           ul.appendChild(li);

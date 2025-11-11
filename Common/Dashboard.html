@@ -903,7 +903,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           // ✅ Redirect on click to market.html with marketId
           li.style.cursor = 'pointer';
           li.addEventListener('click', () => {
-            window.location.href = `/Common/market.html?id=${match.marketId}`;
+            window.location.href = `/Common/Market.html?id=${match.marketId}`;
           });
 
           listContainer.appendChild(li);
@@ -952,7 +952,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           li.style.cursor = 'pointer';  // Cursor pointer for UX
           li.addEventListener('click', () => {
             // MarketId ko query param mein bhej rahe hain
-            window.location.href = `market.html?id=${encodeURIComponent(match.marketId)}`;
+            window.location.href = `/Common/Market.html?id=${encodeURIComponent(match.marketId)}`;
           });
 
           listContainer.appendChild(li);
@@ -1000,7 +1000,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           div.style.margin = '2px';
 
           div.innerHTML = `
-            <a href="/Common/market.html?id=${match.marketId}" style="color:white; width:auto;">
+            <a href="/Common/Market.html?id=${match.marketId}" style="color:white; width:auto;">
               <b class="chkmobile">
                 <span class="slidedate market-time">${localTime}</span>
                 <span class="d-none utctime" data-format="h:mm A">${utcTime}</span>
@@ -1071,7 +1071,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           div.style.margin = '2px';
 
           div.innerHTML = `
-            <a href="/Common/market.html?id=${match.marketId}" style="color:white; width:auto;">
+            <a href="/Common/Market.html?id=${match.marketId}" style="color:white; width:auto;">
               <b class="chkmobile">
                 <span class="slidedate market-time">${localTime}</span>
                 <span class="d-none utctime" data-format="h:mm A">${utcTime}</span>
@@ -1161,7 +1161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       li.style.cursor = 'pointer';
 
       li.addEventListener('click', () => {
-        window.location.href = `/Common/market.html?id=${matchId}`;
+        window.location.href = `/Common/Market.html?id=${matchId}`;
       });
 
       listContainer.appendChild(li);
@@ -1227,7 +1227,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       li.style.cursor = 'pointer';
 
       li.addEventListener('click', () => {
-        window.location.href = `/Common/market.html?id=${matchId}`;
+        window.location.href = `/Common/Market.html?id=${matchId}`;
       });
 
       listContainer.appendChild(li);
@@ -1279,7 +1279,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           li.style.cursor = 'pointer';
 
           li.addEventListener('click', () => {
-            window.location.href = `/Common/market.html?id=${matchId}`;
+            window.location.href = `/Common/Market.html?id=${matchId}`;
           });
 
           ul.appendChild(li);
@@ -1392,7 +1392,7 @@ setTimeout(() => {
   if (matchLink) {
     matchLink.addEventListener('click', (e) => {
       e.stopPropagation(); // prevent parent events
-      window.location.href = `/Common/market.html?id=${match.marketId}`;
+      window.location.href = `/Common/Market.html?id=${match.marketId}`;
     });
   }
 }, 0);
@@ -1732,7 +1732,7 @@ function updateTotalInPlayCount() {
               matchLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                window.location.href = `/Common/market.html?id=${match.marketId}`;
+                window.location.href = `/Common/Market.html?id=${match.marketId}`;
               });
             }
           }, 0);
@@ -1957,7 +1957,7 @@ function updateTotalInPlayCount() {
               matchLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                window.location.href = `/Common/market.html?id=${match.marketId}`;
+                window.location.href = `/Common/Market.html?id=${match.marketId}`;
               });
             }
           }, 0);
