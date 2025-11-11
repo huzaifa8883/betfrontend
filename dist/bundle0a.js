@@ -24348,7 +24348,7 @@ function SoundPlayer() {
 /*! E3 General 
  * 2019 BetPro
  */
-let svc_prefix = "http://localhost:5000/api/"
+let svc_prefix = "https://bettingbackending.work.gd/api/"
   , cid = "";
 const LOGOUT_KEY = "logout-event"
   , LOGGED_OUT_URL = "/Common/LoggedOut";
