@@ -781,25 +781,30 @@
 </style>
 <script>
   async function getSportByMarketId(marketId) {
-    try {
-      const res = await fetch(`https://bettingbackending.work.gd/api/markets/catalog2?id=${marketId}`);
-      const data = await res.json();
+  try {
+    const res = await fetch(`https://bettingbackending.work.gd/api/markets/catalog2?id=${marketId}`);
+    const data = await res.json();
 
-      console.log("Catalog2 API response:", data);
+    console.log("Catalog2 API response:", data);
 
-      // Force OPEN display if status is IN-PLAY
-      const displayStatus =
-        data.status?.toUpperCase() === 'OPEN' ? 'Inplay' : data.status?.toUpperCase() || 'Inplay';
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromParam = urlParams.get('from'); // 'inplay' ya null
 
-      document.querySelector('.green-upper-text').textContent = displayStatus;
-
-      const matchName = data.eventName || data.match || 'Unknown Match';
-      document.title = `${matchName} | BetPro`;
-
-    } catch (error) {
-      console.error("Error fetching sport by marketId:", error);
+    let displayStatus = data.status?.toUpperCase() || 'UNKNOWN';
+    if (displayStatus === 'OPEN' && fromParam === 'inplay') {
+        displayStatus = 'Inplay';
     }
+
+    document.querySelector('.green-upper-text').textContent = displayStatus;
+
+    const matchName = data.eventName || data.match || 'Unknown Match';
+    document.title = `${matchName} | BetPro`;
+
+  } catch (error) {
+    console.error("Error fetching sport by marketId:", error);
   }
+}
+
 
   async function initMarketPage() {
     const urlParams = new URLSearchParams(window.location.search);
