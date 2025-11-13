@@ -4635,7 +4635,7 @@ setInterval(() => {
 document.addEventListener("DOMContentLoaded", updateUserWallet);
 </script> -->
 <script>
-const socket = io("https://bettingbackending.work.gd");
+const socket = io("https://bettingbackending.work.gd:5000");
 const matchId = new URLSearchParams(window.location.search).get("id");
 const token = localStorage.getItem("token");
 let UnMatched = [];
@@ -4782,26 +4782,19 @@ async function fetchUnMatched() {
     const res = await fetch(`${ordersUrl}/orders/unmatched?matchId=${matchId}`, { headers: { "Authorization": `Bearer ${token}` } });
     let list = await res.json();
     if (!Array.isArray(list)) list = list.orders || [];
-
-    list.forEach(o => {
-      const existing = UnMatched.find(u => u.orderId === o.orderId || u.requestId === o.requestId);
-      const newObj = {
-        orderId: o.orderId || o.requestId,
-        rn: o.runnerName || o.selectionId,
-        up: o.price,
-        us: o.size,
-        bs: (o.side || o.type || "").toUpperCase(),
-        requestId: o.requestId || o.orderId
-      };
-      if (existing) Object.assign(existing, newObj);
-      else UnMatched.push(newObj);
-    });
-
+    UnMatched = list.map(o => ({
+      orderId: o.orderId || o.requestId,
+      rn: o.runnerName || o.selectionId,
+      up: o.price,
+      us: o.size,
+      bs: (o.side || o.type || "").toUpperCase()
+    }));
     render();
   } catch (e) {
     console.error("Error fetching unmatched:", e);
   }
 }
+
 async function fetchMatched() {
   try {
     const res = await fetch(`${ordersUrl}/orders/matched?matchId=${matchId}`, { headers: { "Authorization": `Bearer ${token}` } });
@@ -4880,39 +4873,30 @@ socket.on("disconnect", () => {
 
 socket.on("ordersUpdated", data => {
   if (!data || !Array.isArray(data.newOrders)) return;
-
-  data.newOrders.forEach(o => {
-    const status = o.status || "";
-    if (status === "PENDING") {
-      const existing = UnMatched.find(u => u.orderId === o.orderId || u.requestId === o.requestId);
-      const newObj = {
-        orderId: o.orderId || o.requestId,
-        rn: o.runnerName || o.selectionId,
-        up: o.price,
-        us: o.size,
-        bs: (o.side || o.type || "").toUpperCase(),
-        requestId: o.requestId || o.orderId
-      };
-      if (existing) Object.assign(existing, newObj);
-      else UnMatched.push(newObj);
-    } else if (status === "MATCHED") {
-      const existing = Matched.find(m => m.orderId === o.orderId || m.requestId === o.requestId);
-      const newObj = {
-        orderId: o.orderId || o.requestId,
-        rn: o.runnerName || o.selectionId,
-        mp: o.price,
-        ms: o.size,
-        bs: (o.side || o.type || "").toUpperCase(),
-        matchId: o.matchId || o.marketId,
-        requestId: o.requestId || o.orderId
-      };
-      if (existing) Object.assign(existing, newObj);
-      else Matched.push(newObj);
-    }
-  });
-
+  const unmatched = data.newOrders.filter(o => o.status === "PENDING");
+  const matched = data.newOrders.filter(o => o.status === "MATCHED");
+  if (unmatched.length) {
+    UnMatched = unmatched.map(o => ({
+      orderId: o.orderId || o.requestId,
+      rn: o.runnerName || o.selectionId,
+      up: o.price,
+      us: o.size,
+      bs: (o.side || o.type || "").toUpperCase()
+    }));
+  }
+  if (matched.length) {
+    Matched = matched.map(o => ({
+      orderId: o.orderId || o.requestId,
+      rn: o.runnerName || o.selectionId,
+      mp: o.price,
+      ms: o.size,
+      bs: (o.side || o.type || "").toUpperCase(),
+      matchId: o.matchId || o.marketId
+    }));
+  }
   render();
 });
+
 // ---------------------------
 // AUTO REFRESH
 // ---------------------------
