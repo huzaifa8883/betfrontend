@@ -1002,7 +1002,7 @@ if (!selectedRoleInput) {
 };
 
   try {
-    const res = await fetch("http://localhost:5000/api/users/create", {
+    const res = await fetch("https://bettingbackending.work.gd/api/users/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1068,7 +1068,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!token) return;
 
   try {
-    const res = await fetch("http://localhost:5000/api/users/latest", {
+    const res = await fetch("https://bettingbackending.work.gd/api/users/latest", {
       headers: { "Authorization": "Bearer " + token }
     });
     const data = await res.json();
