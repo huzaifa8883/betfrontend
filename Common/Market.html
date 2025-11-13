@@ -4638,6 +4638,7 @@ document.addEventListener("DOMContentLoaded", updateUserWallet);
 const socket = io("https://bettingbackending.work.gd");
 const matchId = new URLSearchParams(window.location.search).get("id");
 const token = localStorage.getItem("token");
+
 let UnMatched = [];
 let Matched = [];
 let runnerPnL = {};
@@ -4716,7 +4717,7 @@ function updateRunnerPnL() {
 function render() {
   updateRunnerPnL();
 
-  // Unmatched table (unchanged)
+  // Unmatched table
   const ub = document.getElementById("unmatched-body");
   ub.innerHTML = "";
   UnMatched.forEach(o => {
@@ -4733,46 +4734,27 @@ function render() {
   document.getElementById("unmatched-count").textContent = UnMatched.length;
   document.getElementById("cancelAllBtn").style.display = UnMatched.length > 0 ? "inline-block" : "none";
 
-  // Matched table (updated)
+  // Matched table
   const mb = document.getElementById("matched-body");
   mb.innerHTML = "";
   allRunners.forEach(runner => {
     const runnerOrders = Matched.filter(o => (o.rn || "").toLowerCase() === runner.toLowerCase());
-    if (runnerOrders.length > 0) { // Only show runners with matched bets
-      runnerOrders.forEach(o => {
-        const tr = document.createElement("tr");
-        tr.className = o.bs === "B" ? "back" : "lay";
-        tr.innerHTML = `
-          <td>${o.rn}</td>
-          <td>${o.mp}</td>
-          <td>${format(o.ms)}</td>
-        `;
-        mb.appendChild(tr);
-      });
-    }
+    runnerOrders.forEach(o => {
+      const tr = document.createElement("tr");
+      tr.className = o.bs === "B" ? "back" : "lay";
+      tr.innerHTML = `
+        <td>${o.rn}</td>
+        <td>${o.mp}</td>
+        <td>${format(o.ms)}</td>
+      `;
+      mb.appendChild(tr);
+    });
   });
 
   document.getElementById("matched-count").textContent = Matched.length;
   window.dispatchEvent(new Event("runnerPnLUpdated"));
   updateUserWallet();
 }
-
-// Utility for Vue / template (unchanged)
-window.getRunnerAmounts = function(runnerName) {
-  const normalized = runnerName.trim().toLowerCase();
-  if (!allRunners.some(r => r.trim().toLowerCase() === normalized)) {
-    allRunners.push(runnerName);
-    updateRunnerPnL();
-  }
-  const key = Object.keys(runnerPnL).find(k => k.trim().toLowerCase() === normalized);
-  const { profit, liability, net } = runnerPnL[key] || { profit: 0, liability: 0, net: 0 };
-
-  const otherLiability = Object.keys(runnerPnL)
-    .filter(k => k.trim().toLowerCase() !== normalized)
-    .reduce((sum, k) => sum + (runnerPnL[k]?.liability || 0), 0);
-
-  return { ifWin: net, ifLose: otherLiability, net };
-};
 
 // ---------------------------
 // API HELPERS
@@ -4782,13 +4764,21 @@ async function fetchUnMatched() {
     const res = await fetch(`${ordersUrl}/orders/unmatched?matchId=${matchId}`, { headers: { "Authorization": `Bearer ${token}` } });
     let list = await res.json();
     if (!Array.isArray(list)) list = list.orders || [];
-    UnMatched = list.map(o => ({
-      orderId: o.orderId || o.requestId,
-      rn: o.runnerName || o.selectionId,
-      up: o.price,
-      us: o.size,
-      bs: (o.side || o.type || "").toUpperCase()
-    }));
+
+    list.forEach(o => {
+      const existing = UnMatched.find(u => u.requestId === o.requestId || u.orderId === o.orderId);
+      const newObj = {
+        orderId: o.orderId || o.requestId,
+        requestId: o.requestId || o.orderId,
+        rn: o.runnerName || o.selectionId,
+        up: o.price,
+        us: o.size,
+        bs: (o.side || o.type || "").toUpperCase()
+      };
+      if (existing) Object.assign(existing, newObj);
+      else UnMatched.push(newObj);
+    });
+
     render();
   } catch (e) {
     console.error("Error fetching unmatched:", e);
@@ -4800,14 +4790,22 @@ async function fetchMatched() {
     const res = await fetch(`${ordersUrl}/orders/matched?matchId=${matchId}`, { headers: { "Authorization": `Bearer ${token}` } });
     let list = await res.json();
     if (!Array.isArray(list)) list = list.orders || [];
-    Matched = list.map(o => ({
-      orderId: o.orderId || o.requestId,
-      rn: o.runnerName || o.selectionId,
-      mp: o.price,
-      ms: o.size,
-      bs: (o.side || o.type || "").toUpperCase(),
-      matchId: o.matchId || o.marketId
-    }));
+
+    list.forEach(o => {
+      const existing = Matched.find(m => m.requestId === o.requestId || m.orderId === o.orderId);
+      const newObj = {
+        orderId: o.orderId || o.requestId,
+        requestId: o.requestId || o.orderId,
+        rn: o.runnerName || o.selectionId,
+        mp: o.price,
+        ms: o.size,
+        bs: (o.side || o.type || "").toUpperCase(),
+        matchId: o.matchId || o.marketId
+      };
+      if (existing) Object.assign(existing, newObj);
+      else Matched.push(newObj);
+    });
+
     render();
   } catch (e) {
     console.error("Error fetching matched:", e);
@@ -4823,9 +4821,7 @@ async function fetchRunners() {
       allRunners = [...new Set([...allRunners, ...marketRunners])];
       updateRunnerPnL();
       render();
-    } else {
-      console.warn("No runners found in market data");
-    }
+    } else console.warn("No runners found in market data");
   } catch (e) {
     console.error("Error fetching runners:", e);
   }
@@ -4873,31 +4869,37 @@ socket.on("disconnect", () => {
 
 socket.on("ordersUpdated", data => {
   if (!data || !Array.isArray(data.newOrders)) return;
-  const unmatched = data.newOrders.filter(o => o.status === "PENDING");
-  const matched = data.newOrders.filter(o => o.status === "MATCHED");
-  if (unmatched.length) {
-UnMatched = [
-  ...UnMatched.filter(u => !unmatched.some(n => n.orderId === u.orderId)),
-  ...unmatched.map(o => ({
-    orderId: o.orderId || o.requestId,
-    rn: o.runnerName || o.selectionId,
-    up: o.price,
-    us: o.size,
-    bs: (o.side || o.type || "").toUpperCase()
-  }))
-];
 
-  }
-  if (matched.length) {
-    Matched = matched.map(o => ({
-      orderId: o.orderId || o.requestId,
-      rn: o.runnerName || o.selectionId,
-      mp: o.price,
-      ms: o.size,
-      bs: (o.side || o.type || "").toUpperCase(),
-      matchId: o.matchId || o.marketId
-    }));
-  }
+  data.newOrders.forEach(o => {
+    const status = o.status || "";
+    if (status === "PENDING") {
+      const existing = UnMatched.find(u => u.requestId === o.requestId || u.orderId === o.orderId);
+      const newObj = {
+        orderId: o.orderId || o.requestId,
+        requestId: o.requestId || o.orderId,
+        rn: o.runnerName || o.selectionId,
+        up: o.price,
+        us: o.size,
+        bs: (o.side || o.type || "").toUpperCase()
+      };
+      if (existing) Object.assign(existing, newObj);
+      else UnMatched.push(newObj);
+    } else if (status === "MATCHED") {
+      const existing = Matched.find(m => m.requestId === o.requestId || m.orderId === o.orderId);
+      const newObj = {
+        orderId: o.orderId || o.requestId,
+        requestId: o.requestId || o.orderId,
+        rn: o.runnerName || o.selectionId,
+        mp: o.price,
+        ms: o.size,
+        bs: (o.side || o.type || "").toUpperCase(),
+        matchId: o.matchId || o.marketId
+      };
+      if (existing) Object.assign(existing, newObj);
+      else Matched.push(newObj);
+    }
+  });
+
   render();
 });
 
@@ -4911,11 +4913,15 @@ setInterval(() => {
   }
 }, 5000);
 
+// ---------------------------
+// INIT
+// ---------------------------
 document.addEventListener("DOMContentLoaded", async () => {
   updateUserWallet();
   await fetchRunners();
 });
 </script>
+
 
 
             </center>
