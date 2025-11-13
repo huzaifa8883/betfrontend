@@ -4876,13 +4876,17 @@ socket.on("ordersUpdated", data => {
   const unmatched = data.newOrders.filter(o => o.status === "PENDING");
   const matched = data.newOrders.filter(o => o.status === "MATCHED");
   if (unmatched.length) {
-    UnMatched = unmatched.map(o => ({
-      orderId: o.orderId || o.requestId,
-      rn: o.runnerName || o.selectionId,
-      up: o.price,
-      us: o.size,
-      bs: (o.side || o.type || "").toUpperCase()
-    }));
+UnMatched = [
+  ...UnMatched.filter(u => !unmatched.some(n => n.orderId === u.orderId)),
+  ...unmatched.map(o => ({
+    orderId: o.orderId || o.requestId,
+    rn: o.runnerName || o.selectionId,
+    up: o.price,
+    us: o.size,
+    bs: (o.side || o.type || "").toUpperCase()
+  }))
+];
+
   }
   if (matched.length) {
     Matched = matched.map(o => ({
