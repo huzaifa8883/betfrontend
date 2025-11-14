@@ -790,12 +790,9 @@
     const urlParams = new URLSearchParams(window.location.search);
     const fromParam = urlParams.get('from'); // 'inplay' ya null
 
-    let displayStatus = data.status?.toUpperCase() || 'UNKNOWN';
-    if (displayStatus === 'OPEN' && fromParam === 'inplay') {
-        displayStatus = 'Inplay';
-    }
+  
 
-    document.querySelector('.green-upper-text').textContent = displayStatus;
+    // document.querySelector('.green-upper-text').textContent = displayStatus;
 
     const matchName = data.eventName || data.match || 'Unknown Match';
     document.title = `${matchName} | BetPro`;
