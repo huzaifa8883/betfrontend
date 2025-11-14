@@ -4635,9 +4635,10 @@ setInterval(() => {
 document.addEventListener("DOMContentLoaded", updateUserWallet);
 </script> -->
 <script>
-const socket = io("https://bettingbackending.work.gd:5000");
+const socket = io("https://bettingbackending.work.gd");
 const matchId = new URLSearchParams(window.location.search).get("id");
 const token = localStorage.getItem("token");
+
 let UnMatched = [];
 let Matched = [];
 let runnerPnL = {};
@@ -4646,77 +4647,93 @@ let allRunners = [];
 // ---------------------------
 // Utilities
 // ---------------------------
-function format(n) { return Number(n || 0).toLocaleString(); }
+function format(n) {
+    return Number(n || 0).toLocaleString();
+}
 
 // ---------------------------
 // USER INFO (WALLET + LIABILITY)
 // ---------------------------
 async function updateUserWallet() {
-  if (!token) return;
-  try {
-    const res = await fetch(`${ordersUrl}/users/latest`, { headers: { "Authorization": "Bearer " + token } });
-    const data = await res.json();
-    if (data.success && data.user) {
-      const user = data.user;
-      const userBtn = document.getElementById("navbar-user");
-      if (userBtn) userBtn.innerHTML = `${user.username} (${user.role}) <i class="fas fa-caret-down"></i>`;
-      const walletBalance = document.querySelector(".wallet-balance");
-      if (walletBalance) walletBalance.textContent = `B: ${Math.floor(user.wallet_balance ?? 0)}`;
-      const walletExposure = document.querySelector(".wallet-exposure");
-      if (walletExposure) walletExposure.textContent = `| L: -${Math.floor(user.liable ?? 0)}`;
+    if (!token) return;
+
+    try {
+        const res = await fetch("https://bettingbackending.work.gd/api/users/latest", {
+            headers: { "Authorization": "Bearer " + token }
+        });
+        const data = await res.json();
+        if (data.success && data.user) {
+            const user = data.user;
+
+            // Navbar username + role
+            const userBtn = document.getElementById("navbar-user");
+            if (userBtn) userBtn.innerHTML = `${user.username} (${user.role}) <i class="fas fa-caret-down"></i>`;
+
+            // Wallet balance
+            const walletBalance = document.querySelector(".wallet-balance");
+            if (walletBalance) walletBalance.textContent = `B: ${Math.floor(user.wallet_balance ?? 0)}`;
+
+            // Wallet exposure/liability
+            const walletExposure = document.querySelector(".wallet-exposure");
+            if (walletExposure) walletExposure.textContent = `| L: -${Math.floor(user.liable ?? 0)}`;
+        }
+    } catch (err) {
+        console.error("Error loading latest user info:", err);
     }
-  } catch (err) {
-    console.error("Error loading latest user info:", err);
-  }
 }
 
 // ---------------------------
 // PNL CALCULATIONS
 // ---------------------------
 function calculateRunnerPnL(runnerName) {
-  const normalized = runnerName.trim().toLowerCase();
   let profit = 0;
   let liability = 0;
+  const normalizedRunnerName = runnerName.trim().toLowerCase();
 
   Matched.forEach(order => {
     const rn = (order.rn || "").trim().toLowerCase();
     const odds = Number(order.mp || 0);
     const stake = Number(order.ms || 0);
     const side = (order.bs || "").toUpperCase();
+
     if (!rn || odds === 0 || stake === 0) return;
 
-    if (rn === normalized) {
-      if (side === "B") profit += (odds - 1) * stake;
-      else if (side === "L") liability += (odds - 1) * stake;
+    if (rn === normalizedRunnerName) {
+      // Bets on this runner
+      if (side === "B") {
+        profit += (odds - 1) * stake;
+      } else if (side === "L") {
+        liability += (odds - 1) * stake;
+      }
     } else {
-      if (side === "B") liability += stake;
-      else if (side === "L") profit += stake;
+      // Bets on other runners affect this runner
+      if (side === "B") {
+        liability += stake; // Back on other runner increases this runner's liability
+      } else if (side === "L") {
+        profit += stake; // Lay on other runner increases this runner's profit
+      }
     }
   });
 
   return { profit, liability, net: profit - liability };
 }
-
 function updateRunnerPnL() {
-  const matchedRunners = [...new Set(Matched.map(o => o.rn || ""))].filter(r => r);
-  const unmatchedRunners = [...new Set(UnMatched.map(o => o.rn || ""))].filter(r => r);
-
-  allRunners = [...new Set([...allRunners, ...matchedRunners, ...unmatchedRunners])];
-
+  const matchedRunners = [...new Set(Matched.map(o => o.rn))];
+  allRunners = [...new Set([...allRunners, ...matchedRunners])];
   runnerPnL = {};
+
   allRunners.forEach(runner => {
     const { profit, liability, net } = calculateRunnerPnL(runner);
     runnerPnL[runner] = { profit, liability, net };
   });
 }
-
 // ---------------------------
 // RENDER TABLES
 // ---------------------------
 function render() {
   updateRunnerPnL();
 
-  // Unmatched table (unchanged)
+  // --- Unmatched Orders ---
   const ub = document.getElementById("unmatched-body");
   ub.innerHTML = "";
   UnMatched.forEach(o => {
@@ -4733,12 +4750,16 @@ function render() {
   document.getElementById("unmatched-count").textContent = UnMatched.length;
   document.getElementById("cancelAllBtn").style.display = UnMatched.length > 0 ? "inline-block" : "none";
 
-  // Matched table (updated)
+  // --- Matched Orders ---
   const mb = document.getElementById("matched-body");
   mb.innerHTML = "";
   allRunners.forEach(runner => {
-    const runnerOrders = Matched.filter(o => (o.rn || "").toLowerCase() === runner.toLowerCase());
-    if (runnerOrders.length > 0) { // Only show runners with matched bets
+    const runnerOrders = Matched.filter(o => o.rn.toLowerCase() === runner.toLowerCase());
+    const { profit = 0, liability = 0, net = 0 } = runnerPnL[runner] || {};
+    const profitClass = profit >= 0 ? "profit" : "liability";
+    const liabilityClass = liability > 0 ? "liability" : "profit";
+
+    if (runnerOrders.length > 0) {
       runnerOrders.forEach(o => {
         const tr = document.createElement("tr");
         tr.className = o.bs === "B" ? "back" : "lay";
@@ -4746,173 +4767,166 @@ function render() {
           <td>${o.rn}</td>
           <td>${o.mp}</td>
           <td>${format(o.ms)}</td>
+          <td class="${profitClass}">${format(profit)}</td>
+          <td class="${liabilityClass}">${format(-liability)}</td>
+          <td class="${net >= 0 ? 'profit' : 'liability'}">${format(net)}</td>
         `;
         mb.appendChild(tr);
       });
+    } else {
+      const tr = document.createElement("tr");
+      tr.className = "no-bet";
+      tr.innerHTML = `
+        <td>${runner}</td>
+        <td>-</td>
+        <td>-</td>
+        <td class="${profitClass}">${format(profit)}</td>
+        <td class="${liabilityClass}">${format(-liability)}</td>
+        <td class="${net >= 0 ? 'profit' : 'liability'}">${format(net)}</td>
+      `;
+      mb.appendChild(tr);
     }
   });
-
   document.getElementById("matched-count").textContent = Matched.length;
   window.dispatchEvent(new Event("runnerPnLUpdated"));
-  updateUserWallet();
+  updateUserWallet(); // Refresh wallet
 }
-
-// Utility for Vue / template (unchanged)
+// Utility to get runner P&L externally
 window.getRunnerAmounts = function(runnerName) {
-  const normalized = runnerName.trim().toLowerCase();
-  if (!allRunners.some(r => r.trim().toLowerCase() === normalized)) {
-    allRunners.push(runnerName);
-    updateRunnerPnL();
-  }
-  const key = Object.keys(runnerPnL).find(k => k.trim().toLowerCase() === normalized);
-  const { profit, liability, net } = runnerPnL[key] || { profit: 0, liability: 0, net: 0 };
-
-  const otherLiability = Object.keys(runnerPnL)
-    .filter(k => k.trim().toLowerCase() !== normalized)
-    .reduce((sum, k) => sum + (runnerPnL[k]?.liability || 0), 0);
-
-  return { ifWin: net, ifLose: otherLiability, net };
+    const normalized = runnerName.trim().toLowerCase();
+    const key = Object.keys(runnerPnL).find(k => k.trim().toLowerCase() === normalized);
+    return runnerPnL[key] || 0;
 };
 
 // ---------------------------
 // API HELPERS
 // ---------------------------
 async function fetchUnMatched() {
-  try {
-    const res = await fetch(`${ordersUrl}/orders/unmatched?matchId=${matchId}`, { headers: { "Authorization": `Bearer ${token}` } });
-    let list = await res.json();
-    if (!Array.isArray(list)) list = list.orders || [];
-    UnMatched = list.map(o => ({
-      orderId: o.orderId || o.requestId,
-      rn: o.runnerName || o.selectionId,
-      up: o.price,
-      us: o.size,
-      bs: (o.side || o.type || "").toUpperCase()
-    }));
-    render();
-  } catch (e) {
-    console.error("Error fetching unmatched:", e);
-  }
+    try {
+        const res = await fetch(`${ordersUrl}/orders/unmatched?matchId=${matchId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        let list = await res.json();
+        if (!Array.isArray(list)) list = list.orders || [];
+
+        UnMatched = list.map(o => ({
+            orderId: o.orderId || o.requestId,
+            rn: o.runnerName || o.selectionId,
+            up: o.price,
+            us: o.size,
+            bs: (o.side || o.type || "").toUpperCase()
+        }));
+        render();
+    } catch (e) { console.error("Error fetching unmatched:", e); }
 }
 
 async function fetchMatched() {
-  try {
-    const res = await fetch(`${ordersUrl}/orders/matched?matchId=${matchId}`, { headers: { "Authorization": `Bearer ${token}` } });
-    let list = await res.json();
-    if (!Array.isArray(list)) list = list.orders || [];
-    Matched = list.map(o => ({
-      orderId: o.orderId || o.requestId,
-      rn: o.runnerName || o.selectionId,
-      mp: o.price,
-      ms: o.size,
-      bs: (o.side || o.type || "").toUpperCase(),
-      matchId: o.matchId || o.marketId
-    }));
-    render();
-  } catch (e) {
-    console.error("Error fetching matched:", e);
-  }
+    try {
+        const res = await fetch(`${ordersUrl}/orders/matched?matchId=${matchId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        let list = await res.json();
+        if (!Array.isArray(list)) list = list.orders || [];
+
+        Matched = list.map(o => ({
+            orderId: o.orderId || o.requestId,
+            rn: o.runnerName || o.selectionId,
+            mp: o.price,
+            ms: o.size,
+            bs: (o.side || o.type || "").toUpperCase(),
+            matchId: o.matchId || o.marketId
+        }));
+        render();
+    } catch (e) { console.error("Error fetching matched:", e); }
 }
 
 async function fetchRunners() {
-  try {
-    const res = await fetch(`${ordersUrl}/markets/${matchId}`, { headers: { "Authorization": `Bearer ${token}` } });
-    const market = await res.json();
-    if (market && Array.isArray(market.runners)) {
-      const marketRunners = market.runners.map(r => r.runnerName || r.selectionId).filter(r => r);
-      allRunners = [...new Set([...allRunners, ...marketRunners])];
-      updateRunnerPnL();
-      render();
-    } else {
-      console.warn("No runners found in market data");
-    }
-  } catch (e) {
-    console.error("Error fetching runners:", e);
-  }
+    try {
+        const res = await fetch(`${ordersUrl}/markets/${matchId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        const market = await res.json();
+        if (market && Array.isArray(market.runners) && market.runners.length > 0) {
+            allRunners = market.runners.map(r => r.runnerName || r.selectionId);
+        }
+    } catch (e) { console.error("Error fetching runners:", e); }
 }
 
-// ---------------------------
-// CANCEL FUNCTIONS
-// ---------------------------
+// Cancel orders
 async function cancelOrder(orderId) {
-  try {
-    await fetch(`${ordersUrl}/orders/cancel/${orderId}`, { method: "POST" });
-    fetchUnMatched();
-    updateUserWallet();
-  } catch (e) {
-    console.error("Error canceling order:", e);
-  }
+    try {
+        await fetch(`${ordersUrl}/orders/cancel/${orderId}`, { method: "POST" });
+        fetchUnMatched();
+        updateUserWallet();
+    } catch (e) { console.error("Error canceling order:", e); }
 }
 
 async function cancelAll() {
-  try {
-    await fetch(`${ordersUrl}/orders/cancelAll?matchId=${matchId}`, { method: "POST" });
-    fetchUnMatched();
-    updateUserWallet();
-  } catch (e) {
-    console.error("Error canceling all:", e);
-  }
+    try {
+        await fetch(`${ordersUrl}/orders/cancelAll?matchId=${matchId}`, { method: "POST" });
+        fetchUnMatched();
+        updateUserWallet();
+    } catch (e) { console.error("Error canceling all:", e); }
 }
 
 // ---------------------------
 // SOCKET EVENTS
 // ---------------------------
 socket.on("connect", async () => {
-  document.getElementById("isConnected").style.display = "inline";
-  socket.emit("JoinMatch", { matchId }, async ack => {
-    await fetchRunners();
-    await fetchUnMatched();
-    await fetchMatched();
-    await updateUserWallet();
-  });
+    document.getElementById("isConnected").style.display = "inline";
+    socket.emit("JoinMatch", { matchId }, async ack => {
+        await fetchRunners();
+        await fetchUnMatched();
+        await fetchMatched();
+        await updateUserWallet();
+    });
 });
 
 socket.on("disconnect", () => {
-  document.getElementById("isConnected").style.display = "none";
+    document.getElementById("isConnected").style.display = "none";
 });
 
 socket.on("ordersUpdated", data => {
-  if (!data || !Array.isArray(data.newOrders)) return;
-  const unmatched = data.newOrders.filter(o => o.status === "PENDING");
-  const matched = data.newOrders.filter(o => o.status === "MATCHED");
-  if (unmatched.length) {
-    UnMatched = unmatched.map(o => ({
-      orderId: o.orderId || o.requestId,
-      rn: o.runnerName || o.selectionId,
-      up: o.price,
-      us: o.size,
-      bs: (o.side || o.type || "").toUpperCase()
-    }));
-  }
-  if (matched.length) {
-    Matched = matched.map(o => ({
-      orderId: o.orderId || o.requestId,
-      rn: o.runnerName || o.selectionId,
-      mp: o.price,
-      ms: o.size,
-      bs: (o.side || o.type || "").toUpperCase(),
-      matchId: o.matchId || o.marketId
-    }));
-  }
-  render();
+    if (!data || !Array.isArray(data.newOrders)) return;
+    const unmatched = data.newOrders.filter(o => o.status === "PENDING");
+    const matched = data.newOrders.filter(o => o.status === "MATCHED");
+
+    if (unmatched.length) {
+        UnMatched = unmatched.map(o => ({
+            orderId: o.orderId || o.requestId,
+            rn: o.runnerName || o.selectionId,
+            up: o.price,
+            us: o.size,
+            bs: (o.side || o.type || "").toUpperCase()
+        }));
+    }
+
+    if (matched.length) {
+        Matched = matched.map(o => ({
+            orderId: o.orderId || o.requestId,
+            rn: o.runnerName || o.selectionId,
+            mp: o.price,
+            ms: o.size,
+            bs: (o.side || o.type || "").toUpperCase(),
+            matchId: o.matchId || o.marketId
+        }));
+    }
+
+    render();
 });
 
 // ---------------------------
 // AUTO REFRESH
 // ---------------------------
 setInterval(() => {
-  if (matchId) {
-    fetchUnMatched();
-    fetchMatched();
-  }
+    if (matchId) {
+        fetchUnMatched();
+        fetchMatched();
+    }
 }, 5000);
 
-document.addEventListener("DOMContentLoaded", async () => {
-  updateUserWallet();
-  await fetchRunners();
-});
-</script>
-
+document.addEventListener("DOMContentLoaded", updateUserWallet);
+</script> 
             </center>
            
         </div>
