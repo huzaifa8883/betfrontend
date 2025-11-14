@@ -4662,12 +4662,27 @@ async function updateUserWallet() {
         const data = await res.json();
         if (data.success && data.user) {
             const user = data.user;
+
+            // Navbar display
             const userBtn = document.getElementById("navbar-user");
             if (userBtn) userBtn.innerHTML = `${user.username} (${user.role}) <i class="fas fa-caret-down"></i>`;
+
+            // Wallet balance
             const walletBalance = document.querySelector(".wallet-balance");
             if (walletBalance) walletBalance.textContent = `B: ${Math.floor(user.wallet_balance ?? 0)}`;
+
+            // Liability calculation (manual from Matched if server liable stale)
             const walletExposure = document.querySelector(".wallet-exposure");
-            if (walletExposure) walletExposure.textContent = `| L: -${Math.floor(user.liable ?? 0)}`;
+            if (walletExposure) {
+                let totalLiable = Matched.reduce((sum, o) => {
+                    const odds = Number(o.mp || 0);
+                    const stake = Number(o.ms || 0);
+                    const side = o.bs || "";
+                    if (side === "L") return sum + (odds - 1) * stake;
+                    return sum;
+                }, 0);
+                walletExposure.textContent = `| L: -${Math.floor(totalLiable)}`;
+            }
         }
     } catch (err) {
         console.error("Error loading latest user info:", err);
@@ -4716,51 +4731,57 @@ function updateRunnerPnL() {
 // ---------------------------
 // RENDER TABLES
 // ---------------------------
-function render() {
+async function render() {
     updateRunnerPnL();
 
     // Unmatched table
     const ub = document.getElementById("unmatched-body");
-    ub.innerHTML = "";
-    UnMatched.forEach(o => {
-        const tr = document.createElement("tr");
-        tr.className = o.bs === "B" ? "back" : "lay";
-        tr.innerHTML = `
-            <td>${o.rn}</td>
-            <td>${o.up}</td>
-            <td>${format(o.us)}</td>
-            <td><button class="btn-del" onclick="cancelOrder('${o.orderId}')">X</button></td>
-        `;
-        ub.appendChild(tr);
-    });
-    document.getElementById("unmatched-count").textContent = UnMatched.length;
-    document.getElementById("cancelAllBtn").style.display = UnMatched.length > 0 ? "inline-block" : "none";
+    if (ub) {
+        ub.innerHTML = "";
+        UnMatched.forEach(o => {
+            const tr = document.createElement("tr");
+            tr.className = o.bs === "B" ? "back" : "lay";
+            tr.innerHTML = `
+                <td>${o.rn}</td>
+                <td>${o.up}</td>
+                <td>${format(o.us)}</td>
+                <td><button class="btn-del" onclick="cancelOrder('${o.orderId}')">X</button></td>
+            `;
+            ub.appendChild(tr);
+        });
+        document.getElementById("unmatched-count").textContent = UnMatched.length;
+        document.getElementById("cancelAllBtn").style.display = UnMatched.length > 0 ? "inline-block" : "none";
+    }
 
     // Matched table
     const mb = document.getElementById("matched-body");
-    mb.innerHTML = "";
-    allRunners.forEach(runner => {
-        const runnerOrders = Matched.filter(o => (o.rn || "").toLowerCase() === runner.toLowerCase());
-        if (runnerOrders.length > 0) {
-            runnerOrders.forEach(o => {
-                const tr = document.createElement("tr");
-                tr.className = o.bs === "B" ? "back" : "lay";
-                tr.innerHTML = `
-                    <td>${o.rn}</td>
-                    <td>${o.mp}</td>
-                    <td>${format(o.ms)}</td>
-                `;
-                mb.appendChild(tr);
-            });
-        }
-    });
-    document.getElementById("matched-count").textContent = Matched.length;
+    if (mb) {
+        mb.innerHTML = "";
+        allRunners.forEach(runner => {
+            const runnerOrders = Matched.filter(o => (o.rn || "").toLowerCase() === runner.toLowerCase());
+            if (runnerOrders.length > 0) {
+                runnerOrders.forEach(o => {
+                    const tr = document.createElement("tr");
+                    tr.className = o.bs === "B" ? "back" : "lay";
+                    tr.innerHTML = `
+                        <td>${o.rn}</td>
+                        <td>${o.mp}</td>
+                        <td>${format(o.ms)}</td>
+                    `;
+                    mb.appendChild(tr);
+                });
+            }
+        });
+        document.getElementById("matched-count").textContent = Matched.length;
+    }
 
     window.dispatchEvent(new Event("runnerPnLUpdated"));
-    updateUserWallet();
+    await updateUserWallet(); // Always update wallet after rendering
 }
 
+// ---------------------------
 // Vue/template helper
+// ---------------------------
 window.getRunnerAmounts = function(runnerName) {
     const normalized = runnerName.trim().toLowerCase();
     if (!allRunners.some(r => r.trim().toLowerCase() === normalized)) {
@@ -4792,7 +4813,7 @@ async function fetchUnMatched() {
             us: o.size,
             bs: (o.side || o.type || "").toUpperCase()
         }));
-        render();
+        await render();
     } catch (e) {
         console.error("Error fetching unmatched:", e);
     }
@@ -4813,7 +4834,7 @@ async function fetchMatched() {
             bs: (o.side || o.type || "").toUpperCase(),
             matchId: o.matchId || o.marketId
         }));
-        render();
+        await render();
     } catch (e) {
         console.error("Error fetching matched:", e);
     }
@@ -4829,7 +4850,7 @@ async function fetchRunners() {
             const marketRunners = market.runners.map(r => r.runnerName || r.selectionId).filter(r => r);
             allRunners = [...new Set([...allRunners, ...marketRunners])];
             updateRunnerPnL();
-            render();
+            await render();
         } else {
             console.warn("No runners found in market data");
         }
@@ -4844,8 +4865,7 @@ async function fetchRunners() {
 async function cancelOrder(orderId) {
     try {
         await fetch(`${ordersUrl}/orders/cancel/${orderId}`, { method: "POST" });
-        fetchUnMatched();
-        updateUserWallet();
+        await fetchUnMatched();
     } catch (e) {
         console.error("Error canceling order:", e);
     }
@@ -4854,8 +4874,7 @@ async function cancelOrder(orderId) {
 async function cancelAll() {
     try {
         await fetch(`${ordersUrl}/orders/cancelAll?matchId=${matchId}`, { method: "POST" });
-        fetchUnMatched();
-        updateUserWallet();
+        await fetchUnMatched();
     } catch (e) {
         console.error("Error canceling all:", e);
     }
@@ -4878,7 +4897,7 @@ socket.on("disconnect", () => {
     document.getElementById("isConnected").style.display = "none";
 });
 
-socket.on("ordersUpdated", data => {
+socket.on("ordersUpdated", async data => {
     if (!data || !Array.isArray(data.newOrders)) return;
 
     const unmatched = data.newOrders.filter(o => o.status === "PENDING");
@@ -4905,24 +4924,25 @@ socket.on("ordersUpdated", data => {
         }));
     }
 
-    render();
+    await render(); // Render + wallet update automatically
 });
 
 // ---------------------------
 // AUTO REFRESH
 // ---------------------------
-setInterval(() => {
+setInterval(async () => {
     if (matchId) {
-        fetchUnMatched();
-        fetchMatched();
+        await fetchUnMatched();
+        await fetchMatched();
     }
 }, 5000);
 
 document.addEventListener("DOMContentLoaded", async () => {
-    updateUserWallet();
+    await updateUserWallet();
     await fetchRunners();
 });
 </script>
+
             </center>
            
         </div>
