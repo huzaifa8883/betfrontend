@@ -4897,8 +4897,10 @@ socket.on("ordersUpdated", data => {
         UnMatched = UnMatched.filter(o => o.orderId !== order.orderId);
         Matched = Matched.filter(o => o.orderId !== order.orderId);
 
-        // Add to the appropriate list based on status
-        if (newO.status === "PENDING") {
+        // Treat UNMATCHED as PENDING
+        const frontendStatus = (newO.status === "MATCHED") ? "MATCHED" : "PENDING";
+
+        if (frontendStatus === "PENDING") {
             UnMatched.push({
                 orderId: order.orderId,
                 rn: order.rn,
@@ -4907,7 +4909,7 @@ socket.on("ordersUpdated", data => {
                 bs: order.bs,
                 status: "PENDING"
             });
-        } else if (newO.status === "MATCHED") {
+        } else if (frontendStatus === "MATCHED") {
             Matched.push({
                 orderId: order.orderId,
                 rn: order.rn,
@@ -4917,10 +4919,10 @@ socket.on("ordersUpdated", data => {
                 matchId: newO.matchId || newO.marketId
             });
         }
-        // canceled or other status stays removed
     });
     render();
 });
+
 
 // ---------------------------
 // AUTO REFRESH
