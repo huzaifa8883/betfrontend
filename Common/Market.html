@@ -4711,6 +4711,7 @@ function updateRunnerPnL() {
 // ---------------------------
 function render() {
   updateRunnerPnL();
+
   // Unmatched table
   const ub = document.getElementById("unmatched-body");
   ub.innerHTML = "";
@@ -4727,6 +4728,7 @@ function render() {
   });
   document.getElementById("unmatched-count").textContent = UnMatched.length;
   document.getElementById("cancelAllBtn").style.display = UnMatched.length > 0 ? "inline-block" : "none";
+
   // Matched table
   const mb = document.getElementById("matched-body");
   mb.innerHTML = "";
@@ -4746,6 +4748,7 @@ function render() {
     }
   });
   document.getElementById("matched-count").textContent = Matched.length;
+
   window.dispatchEvent(new Event("runnerPnLUpdated"));
   updateUserWallet();
 }
@@ -4766,6 +4769,52 @@ window.getRunnerAmounts = function(runnerName) {
 };
 
 // ---------------------------
+// ORDER PROCESSING
+// ---------------------------
+function getCurrentRunnerPrice(runnerName) {
+  const runnerOrders = Matched.filter(o => o.rn.toLowerCase() === runnerName.toLowerCase());
+  if (runnerOrders.length > 0) return Number(runnerOrders[runnerOrders.length - 1].mp);
+  return 0; // default agar matched price na ho
+}
+
+function processOrder(order) {
+  const runnerName = order.runnerName || order.selectionId;
+  const currentPrice = getCurrentRunnerPrice(runnerName);
+  const selectedPrice = Number(order.price);
+
+  let status = "PENDING";
+
+  if (order.bs === "B") {
+    if (currentPrice >= selectedPrice) status = "MATCHED";
+  } else if (order.bs === "L") {
+    if (currentPrice <= selectedPrice) status = "MATCHED";
+  }
+
+  // Remove old order if exists
+  UnMatched = UnMatched.filter(o => o.orderId !== order.orderId);
+  Matched = Matched.filter(o => o.orderId !== order.orderId);
+
+  if (status === "MATCHED") {
+    Matched.push({
+      orderId: order.orderId,
+      rn: runnerName,
+      mp: currentPrice || selectedPrice,
+      ms: order.size,
+      bs: order.bs,
+      matchId: order.matchId || order.marketId
+    });
+  } else {
+    UnMatched.push({
+      orderId: order.orderId,
+      rn: runnerName,
+      up: selectedPrice,
+      us: order.size,
+      bs: order.bs
+    });
+  }
+}
+
+// ---------------------------
 // API HELPERS
 // ---------------------------
 async function fetchUnMatched() {
@@ -4775,12 +4824,13 @@ async function fetchUnMatched() {
     });
     let list = await res.json();
     if (!Array.isArray(list)) list = list.orders || [];
-    UnMatched = list.map(o => ({
+    list.forEach(o => processOrder({
       orderId: o.orderId || o.requestId,
-      rn: o.runnerName || o.selectionId,
-      up: o.price,
-      us: o.size,
-      bs: (o.side || o.type || "").toUpperCase()
+      runnerName: o.runnerName || o.selectionId,
+      price: o.price,
+      size: o.size,
+      bs: (o.side || o.type || "").toUpperCase(),
+      status: o.status
     }));
     render();
   } catch (e) {
@@ -4795,12 +4845,13 @@ async function fetchMatched() {
     });
     let list = await res.json();
     if (!Array.isArray(list)) list = list.orders || [];
-    Matched = list.map(o => ({
+    list.forEach(o => processOrder({
       orderId: o.orderId || o.requestId,
-      rn: o.runnerName || o.selectionId,
-      mp: o.price,
-      ms: o.size,
+      runnerName: o.runnerName || o.selectionId,
+      price: o.price,
+      size: o.size,
       bs: (o.side || o.type || "").toUpperCase(),
+      status: "MATCHED",
       matchId: o.matchId || o.marketId
     }));
     render();
@@ -4870,39 +4921,15 @@ socket.on("disconnect", () => {
 
 socket.on("ordersUpdated", data => {
   if (!data || !Array.isArray(data.newOrders)) return;
-  data.newOrders.forEach(newO => {
-    const order = {
-      orderId: newO.orderId || newO.requestId,
-      rn: newO.runnerName || newO.selectionId,
-      price: newO.price,
-      size: newO.size,
-      bs: (newO.side || newO.type || "").toUpperCase(),
-      status: newO.status
-    };
-    // Remove from both lists if exists
-    UnMatched = UnMatched.filter(o => o.orderId !== order.orderId);
-    Matched = Matched.filter(o => o.orderId !== order.orderId);
-    // Add to the appropriate list based on status
-    if (newO.status === "PENDING") {
-      UnMatched.push({
-        orderId: order.orderId,
-        rn: order.rn,
-        up: order.price,
-        us: order.size,
-        bs: order.bs
-      });
-    } else if (newO.status === "MATCHED") {
-      Matched.push({
-        orderId: order.orderId,
-        rn: order.rn,
-        mp: order.price,
-        ms: order.size,
-        bs: order.bs,
-        matchId: newO.matchId || newO.marketId
-      });
-    }
-    // If canceled or other status, it remains removed
-  });
+  data.newOrders.forEach(newO => processOrder({
+    orderId: newO.orderId || newO.requestId,
+    runnerName: newO.runnerName || newO.selectionId,
+    price: newO.price,
+    size: newO.size,
+    bs: (newO.side || newO.type || "").toUpperCase(),
+    status: newO.status,
+    matchId: newO.matchId || newO.marketId
+  }));
   render();
 });
 
@@ -4921,6 +4948,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await fetchRunners();
 });
 </script>
+
 
             </center>
            
