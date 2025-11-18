@@ -800,13 +800,14 @@ new Vue({
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
-      fetch(ordersUrl + "/orders/all", {
+      return fetch(ordersUrl + "/orders/all", {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(r => r.json())
       .then(list => {
-        // Active bets only (exclude CLOSED/SETTLED)
+        console.log("Raw list:", list); // debug
         const activeBets = list.filter(o => o.status !== "CLOSED" && o.status !== "SETTLED");
+        console.log("Active bets:", activeBets); // debug
 
         this.bets = activeBets.map((o, index) => ({
           index: index + 1,
@@ -821,13 +822,12 @@ new Vue({
             : "-"
         }));
 
-        // Initialize DataTable after DOM updates
         this.$nextTick(() => {
           $('#tableLedger').DataTable({
             responsive: true,
             autoWidth: false,
             scrollX: true,
-            destroy: true // allows reinitialization without errors
+            destroy: true
           });
         });
       })
@@ -838,6 +838,7 @@ new Vue({
     this.fetchBetsHistory();
   }
 });
+
 </script>
 
     <script type="text/javascript" src="https://wurfl.io/wurfl.js"></script>
