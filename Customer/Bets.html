@@ -619,7 +619,7 @@
             <a href="/Customer/StarOrders">Star Casino</a>
           </p>
 
- <div id="app" class="col-sm-12">
+<div id="app" class="col-sm-12">
   <div class="table-responsive">
     <table id="tableLedger" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
       <thead>
@@ -650,6 +650,7 @@
     </table>
   </div>
 </div>
+
 
         </div>
       </div>
@@ -773,16 +774,27 @@
 <script>
 new Vue({
   el: '#app',
-  data: { bets: [] },
+  data: {
+    bets: []
+  },
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
+      if(!token) {
+        console.error("Token not found");
+        return;
+      }
+
       fetch(ordersUrl + "/orders/all", {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(r => r.json())
       .then(list => {
+        if(!Array.isArray(list)) list = [];
+
+        // Sirf active bets rakho
         const activeBets = list.filter(o => o.status !== "CLOSED" && o.status !== "SETTLED");
+
         this.bets = activeBets.map((o, index) => ({
           index: index + 1,
           event: o.event,
@@ -796,18 +808,17 @@ new Vue({
             : "-"
         }));
 
+        // Vue DOM update ke baad DataTable initialize
         this.$nextTick(() => {
+          // Agar pehle se initialized hai, destroy karo
           if ($.fn.dataTable.isDataTable('#tableLedger')) {
-            $('#tableLedger').DataTable().destroy();
+            $('#tableLedger').DataTable().clear().destroy();
           }
+
           $('#tableLedger').DataTable({
             responsive: true,
             autoWidth: false,
-            scrollX: true,
-            paging: true,
-            searching: true,
-            ordering: true,
-            info: true
+            scrollX: true
           });
         });
       })
