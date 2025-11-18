@@ -782,22 +782,15 @@ new Vue({
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("Token not found");
-        return;
-      }
-
-      fetch(ordersUrl + "/orders/all", {
+      return fetch(ordersUrl + "/orders/all", {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(r => r.json())
       .then(list => {
-        if (!Array.isArray(list)) list = [];
+        // 🩵 Sirf active bets rakho (jo CLOSED/SETTLED nahi hain)
+        const activeBets = list.filter(o => o.status !== "CLOSED" && o.status !== "SETTLED");
 
-        // ⚡ Only MATCHED bets
-        const matchedBets = list.filter(o => (o.status || "").toUpperCase() === "MATCHED");
-
-        this.bets = matchedBets.map((o, index) => ({
+        this.bets = activeBets.map((o, index) => ({
           index: index + 1,
           event: o.event,
           runner: o.runnerName,
@@ -805,8 +798,11 @@ new Vue({
           amount: o.size,
           position: (o.type || "").toUpperCase(),
           placed: new Date(o.created_at).toLocaleString(),
-          updated: new Date(o.updated_at || o.created_at).toLocaleString()
+          updated: o.status === "MATCHED"
+            ? new Date(o.updated_at || o.created_at).toLocaleString()
+            : "-"
         }));
+      
 
         // DataTable init
         this.$nextTick(() => {
