@@ -793,18 +793,12 @@ new Vue({
       .then(r => r.json())
       .then(list => {
         if (!Array.isArray(list)) list = [];
-        console.log(list)
 
-        // ⚡ Only active bets (exclude SETTLED/CLOSED) - case-insensitive
-        const activeBets = list.filter(o => {
-          const s = (o.status || "").toUpperCase();
-          return s !== "SETTLED" && s !== "CLOSED";
-        });
-        console.log(activeBets)
-          
+        // ⚡ Only MATCHED bets
+        const matchedBets = list.filter(o => (o.status || "").toUpperCase() === "MATCHED");
 
-        // ⚡ Map to table
-        this.bets = activeBets.map((o, index) => ({
+        // Map bets to table
+        this.bets = matchedBets.map((o, index) => ({
           index: index + 1,
           event: o.event || "-",
           runner: o.runnerName || o.runner || "-",
@@ -815,7 +809,7 @@ new Vue({
           updated: o.updated_at ? new Date(o.updated_at).toLocaleString() : "-"
         }));
 
-        // DataTable safe init
+        // DataTable init
         this.$nextTick(() => {
           if ($.fn.dataTable.isDataTable('#tableLedger')) {
             $('#tableLedger').DataTable().clear().destroy();
