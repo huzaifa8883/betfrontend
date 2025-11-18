@@ -778,23 +778,26 @@ new Vue({
     bets: []
   },
   methods: {
-    fetchBetsHistory() {
+    async fetchBetsHistory() {
       const token = localStorage.getItem("token");
       if(!token) {
         console.error("Token not found");
         return;
       }
 
-      fetch(ordersUrl + "/orders/all", {
-        headers: { "Authorization": "Bearer " + token }
-      })
-      .then(r => r.json())
-      .then(list => {
-        if(!Array.isArray(list)) list = [];
+      try {
+        const response = await fetch(ordersUrl + "/orders/all", {
+          headers: { "Authorization": "Bearer " + token }
+        });
+        
 
-        // Sirf active bets rakho
+        const list = await response.json();
+        console.log("Raw list:", list); // Debug: dekho kya aa raha hai
+
+        if(!Array.isArray(list)) return;
+
         const activeBets = list.filter(o => o.status !== "CLOSED" && o.status !== "SETTLED");
-
+        console.log(activeBets)
         this.bets = activeBets.map((o, index) => ({
           index: index + 1,
           event: o.event,
@@ -808,21 +811,19 @@ new Vue({
             : "-"
         }));
 
-        // Vue DOM update ke baad DataTable initialize
+        // DataTable tab initialize karo jab data aa jaye
         this.$nextTick(() => {
-          // Agar pehle se initialized hai, destroy karo
-          if ($.fn.dataTable.isDataTable('#tableLedger')) {
-            $('#tableLedger').DataTable().clear().destroy();
-          }
-
           $('#tableLedger').DataTable({
             responsive: true,
             autoWidth: false,
-            scrollX: true
+            scrollX: true,
+            destroy: true // Re-initialize safely
           });
         });
-      })
-      .catch(err => console.error("Error fetching bets history:", err));
+
+      } catch(err) {
+        console.error("Error fetching bets history:", err);
+      }
     }
   },
   mounted() {
