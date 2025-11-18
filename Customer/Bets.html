@@ -800,7 +800,8 @@ new Vue({
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
-      return fetch(ordersUrl + "/orders/all", {
+
+      fetch(ordersUrl + "/orders/all", {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(r => r.json())
@@ -822,12 +823,19 @@ new Vue({
             : "-"
         }));
 
+        // Initialize DataTable after Vue has updated DOM
         this.$nextTick(() => {
+          if ($.fn.dataTable.isDataTable('#tableLedger')) {
+            $('#tableLedger').DataTable().destroy();
+          }
           $('#tableLedger').DataTable({
             responsive: true,
             autoWidth: false,
             scrollX: true,
-            destroy: true
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true
           });
         });
       })
@@ -838,7 +846,6 @@ new Vue({
     this.fetchBetsHistory();
   }
 });
-
 </script>
 
     <script type="text/javascript" src="https://wurfl.io/wurfl.js"></script>
