@@ -794,8 +794,10 @@ new Vue({
       .then(list => {
         if (!Array.isArray(list)) list = [];
 
-        // ⚡ Display all bets (remove filter if you want only active)
-        this.bets = list.map((o, index) => ({
+        // ⚡ Only active bets (exclude SETTLED/CLOSED)
+        const activeBets = list.filter(o => o.status !== "SETTLED" && o.status !== "CLOSED");
+
+        this.bets = activeBets.map((o, index) => ({
           index: index + 1,
           event: o.event || "-",
           runner: o.runnerName || "-",
@@ -806,7 +808,7 @@ new Vue({
           updated: o.updated_at ? new Date(o.updated_at).toLocaleString() : "-"
         }));
 
-        // Initialize DataTable after Vue updates DOM
+        // Initialize DataTable after Vue DOM update
         this.$nextTick(() => {
           if ($.fn.dataTable.isDataTable('#tableLedger')) {
             $('#tableLedger').DataTable().clear().destroy();
