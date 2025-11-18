@@ -797,16 +797,15 @@ new Vue({
         // ⚡ Only MATCHED bets
         const matchedBets = list.filter(o => (o.status || "").toUpperCase() === "MATCHED");
 
-        // Map bets to table
         this.bets = matchedBets.map((o, index) => ({
           index: index + 1,
-          event: o.event || "-",
-          runner: o.runnerName || o.runner || "-",
-          price: o.price || 0,
-          amount: o.size || o.liable || 0,
-          position: (o.position || o.type || o.side || "").toUpperCase(),
-          placed: o.created_at ? new Date(o.created_at).toLocaleString() : "-",
-          updated: o.updated_at ? new Date(o.updated_at).toLocaleString() : "-"
+          event: o.event,
+          runner: o.runnerName,
+          price: o.price,
+          amount: o.size,
+          position: (o.type || "").toUpperCase(),
+          placed: new Date(o.created_at).toLocaleString(),
+          updated: new Date(o.updated_at || o.created_at).toLocaleString()
         }));
 
         // DataTable init
@@ -829,6 +828,7 @@ new Vue({
   }
 });
 </script>
+
 
     <script type="text/javascript" src="https://wurfl.io/wurfl.js"></script>
     <script type="text/javascript" src="/dist/bundle0a.js?7200"></script>
