@@ -30,28 +30,7 @@
             font-size: 13px;
         }
     </style>
-<style>
-/* BACK / LAY row colors */
-#tableLedger tr {
-  transition: background-color 0.3s;
-}
 
-/* Responsive child rows styling */
-table.dataTable.dtr-inline.collapsed > tbody > tr.parent td:first-child:before,
-table.dataTable.dtr-inline.collapsed > tbody > tr.parent td:first-child:after {
-  color: #333;
-}
-
-/* Small tweaks for mobile labels */
-ul.dtr-details li span.dtr-title {
-  font-weight: bold;
-  width: 100px; /* fixed width for labels */
-  display: inline-block;
-}
-ul.dtr-details li span.dtr-data {
-  display: inline-block;
-}
-</style>
 
     <script>
         const pricesUrl = "https://prices9.mgs11.com/api";
@@ -640,7 +619,7 @@ ul.dtr-details li span.dtr-data {
             <a href="/Customer/StarOrders">Star Casino</a>
           </p>
 
-    <div id="app" class="col-sm-12">
+   <div id="app" class="col-sm-12">
   <div class="table-responsive">
     <table id="tableLedger" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
       <thead>
@@ -790,26 +769,19 @@ ul.dtr-details li span.dtr-data {
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-
 <script>
 new Vue({
   el: '#app',
-  data: {
-    bets: []
-  },
+  data: { bets: [] },
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
-
       fetch(ordersUrl + "/orders/all", {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(r => r.json())
       .then(list => {
-        console.log("Raw list:", list); // debug
         const activeBets = list.filter(o => o.status !== "CLOSED" && o.status !== "SETTLED");
-        console.log("Active bets:", activeBets); // debug
-
         this.bets = activeBets.map((o, index) => ({
           index: index + 1,
           event: o.event,
@@ -823,7 +795,6 @@ new Vue({
             : "-"
         }));
 
-        // Initialize DataTable after Vue has updated DOM
         this.$nextTick(() => {
           if ($.fn.dataTable.isDataTable('#tableLedger')) {
             $('#tableLedger').DataTable().destroy();
