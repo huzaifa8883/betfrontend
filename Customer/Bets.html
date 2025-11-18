@@ -30,6 +30,28 @@
             font-size: 13px;
         }
     </style>
+<style>
+/* BACK / LAY row colors */
+#tableLedger tr {
+  transition: background-color 0.3s;
+}
+
+/* Responsive child rows styling */
+table.dataTable.dtr-inline.collapsed > tbody > tr.parent td:first-child:before,
+table.dataTable.dtr-inline.collapsed > tbody > tr.parent td:first-child:after {
+  color: #333;
+}
+
+/* Small tweaks for mobile labels */
+ul.dtr-details li span.dtr-title {
+  font-weight: bold;
+  width: 100px; /* fixed width for labels */
+  display: inline-block;
+}
+ul.dtr-details li span.dtr-data {
+  display: inline-block;
+}
+</style>
 
     <script>
         const pricesUrl = "https://prices9.mgs11.com/api";
@@ -618,34 +640,37 @@
             <a href="/Customer/StarOrders">Star Casino</a>
           </p>
 
-          <table id="tableLedger" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%;">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Event</th>
-                <th>Runner</th>
-                <th>Price</th>
-                <th>Amount</th>
-                <th>Position</th>
-                <th>Placed</th>
-                <th>Updated</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="bet in bets" :key="bet.index"
-                 :style="{ backgroundColor: bet.position === 'BACK' ? '#8dd2f0' : '#feabb2' }">
-
-                <td>{{ bet.index }}</td>
-                <td>{{ bet.event }}</td>
-                <td>{{  bet.runner }}</td>
-                <td>{{ bet.price }}</td>
-                <td>{{ bet.amount }}</td>
-                <td>{{ bet.position }}</td>
-                <td>{{ bet.placed }}</td>
-                <td>{{ bet.updated }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div id="app" class="col-sm-12">
+  <div class="table-responsive">
+    <table id="tableLedger" class="table table-striped table-bordered nowrap" style="width:100%">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Event</th>
+          <th>Runner</th>
+          <th>Price</th>
+          <th>Amount</th>
+          <th>Position</th>
+          <th>Placed</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="bet in bets" :key="bet.index"
+            :style="{ backgroundColor: bet.position === 'BACK' ? '#8dd2f0' : '#feabb2' }">
+          <td>{{ bet.index }}</td>
+          <td>{{ bet.event }}</td>
+          <td>{{ bet.runner }}</td>
+          <td>{{ bet.price }}</td>
+          <td>{{ bet.amount }}</td>
+          <td>{{ bet.position }}</td>
+          <td>{{ bet.placed }}</td>
+          <td>{{ bet.updated }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
         </div>
       </div>
@@ -775,12 +800,12 @@ new Vue({
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
-      return fetch(ordersUrl + "/orders/all", {
+      fetch(ordersUrl + "/orders/all", {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(r => r.json())
       .then(list => {
-        // 🩵 Sirf active bets rakho (jo CLOSED/SETTLED nahi hain)
+        // Active bets only (exclude CLOSED/SETTLED)
         const activeBets = list.filter(o => o.status !== "CLOSED" && o.status !== "SETTLED");
 
         this.bets = activeBets.map((o, index) => ({
@@ -795,6 +820,16 @@ new Vue({
             ? new Date(o.updated_at || o.created_at).toLocaleString()
             : "-"
         }));
+
+        // Initialize DataTable after DOM updates
+        this.$nextTick(() => {
+          $('#tableLedger').DataTable({
+            responsive: true,
+            autoWidth: false,
+            scrollX: true,
+            destroy: true // allows reinitialization without errors
+          });
+        });
       })
       .catch(err => console.error("Error fetching bets history:", err));
     }
