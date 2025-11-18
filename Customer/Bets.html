@@ -793,22 +793,29 @@ new Vue({
       .then(r => r.json())
       .then(list => {
         if (!Array.isArray(list)) list = [];
+        console.log(list)
 
-        // ⚡ Only active bets (exclude SETTLED/CLOSED)
-        const activeBets = list.filter(o => o.status !== "SETTLED" && o.status !== "CLOSED");
+        // ⚡ Only active bets (exclude SETTLED/CLOSED) - case-insensitive
+        const activeBets = list.filter(o => {
+          const s = (o.status || "").toUpperCase();
+          return s !== "SETTLED" && s !== "CLOSED";
+        });
+        console.log(activeBets)
+          
 
+        // ⚡ Map to table
         this.bets = activeBets.map((o, index) => ({
           index: index + 1,
           event: o.event || "-",
-          runner: o.runnerName || "-",
+          runner: o.runnerName || o.runner || "-",
           price: o.price || 0,
-          amount: o.size || 0,
+          amount: o.size || o.liable || 0,
           position: (o.position || o.type || o.side || "").toUpperCase(),
           placed: o.created_at ? new Date(o.created_at).toLocaleString() : "-",
           updated: o.updated_at ? new Date(o.updated_at).toLocaleString() : "-"
         }));
 
-        // Initialize DataTable after Vue DOM update
+        // DataTable safe init
         this.$nextTick(() => {
           if ($.fn.dataTable.isDataTable('#tableLedger')) {
             $('#tableLedger').DataTable().clear().destroy();
