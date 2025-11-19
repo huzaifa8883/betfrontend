@@ -1062,7 +1062,7 @@ Sydney Thunder W v Perth Scorchers W                                </a>
                 <p>
                     <a href="/Customer/StarOrders">Star Casino</a>
                 </p>
-                <div id="app" class="col-sm-12">
+             <div id="app" class="col-sm-12">
   <div class="table-responsive">
     <table id="tableLedger" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%;">
       <thead>
@@ -1200,6 +1200,8 @@ Sydney Thunder W v Perth Scorchers W                                </a>
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+
 <script>
 new Vue({
   el: "#app",
@@ -1215,17 +1217,15 @@ new Vue({
       })
       .then(r => r.json())
       .then(list => {
-        const matchedBets = list.filter(o =>
-          (o.status || "").toUpperCase() === "MATCHED"
-        );
+        const matchedBets = list.filter(o => (o.status || "").toUpperCase() === "MATCHED");
 
-        if (this.table) {
-          this.table.clear();
-        }
+        // Clear table first
+        this.table.clear();
 
         matchedBets.forEach((o, index) => {
           const position = (o.type || o.side || "").toUpperCase();
-          const rowNode = this.table.row.add([
+
+          const row = [
             index + 1,
             o.event || "",
             o.runnerName || "",
@@ -1236,9 +1236,11 @@ new Vue({
              <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.created_at}</span>`,
             `<span class="market-time">${new Date(o.updated_at || o.created_at).toLocaleString()}</span>
              <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.updated_at || o.created_at}</span>`
-          ]).draw(false).node();
+          ];
 
-          // Set row color based on BACK / LAY
+          const rowNode = this.table.row.add(row).draw(false).node();
+
+          // Apply color
           $(rowNode).addClass(position === "BACK" ? "table-primary" : "table-danger");
         });
       })
@@ -1246,18 +1248,14 @@ new Vue({
     }
   },
   mounted() {
-    // Initialize DataTable with responsive plugin
+    // Initialize DataTable first
     this.table = $('#tableLedger').DataTable({
-      responsive: {
-        details: {
-          type: 'inline', // inline child rows for mobile
-          target: 'tr'
-        }
-      },
+      responsive: true,
       autoWidth: false,
       scrollX: true
     });
 
+    // Fetch data after table initialization
     this.fetchBetsHistory();
   }
 });
