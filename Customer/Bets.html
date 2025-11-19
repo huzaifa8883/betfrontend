@@ -926,7 +926,7 @@ Sydney Thunder W v Perth Scorchers W                                </a>
                     </div>
 
 
-                    <div class="dropdown-wrap">
+                     <div class="dropdown-wrap">
                         <div class="dropdown">
 
                             <div class="designation">
@@ -934,8 +934,8 @@ Sydney Thunder W v Perth Scorchers W                                </a>
                                 <span class="wallet-exposure"> | L: - |</span>
                             </div>
 
-                            <button class="btn profile-dropdown dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    alsBettor
+                          <button class="btn profile-dropdown dropdown-toggle" type="button"  id="navbar-user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" href="/Customer/Ledger/">Statement</a>
@@ -1273,7 +1273,43 @@ $(document).ready(function() {
     .catch(err => console.error("Error fetching bets:", err));
 });
 </script>
+    <script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const token = localStorage.getItem("token");
+  if (!token) return;
 
+  try {
+    const res = await fetch("https://bettingbackending.work.gd/api/users/latest", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await res.json();
+    console.log("Latest user info:", data);
+
+    if (data.success && data.user) {
+      const user = data.user;
+
+      // Update username in navbar
+      const userBtn = document.getElementById("navbar-user");
+      if (userBtn)
+        userBtn.innerHTML = `${user.username} (${user.role}) <i class="fas fa-caret-down"></i>`;
+
+      // ✅ Update Credit, Balance, Liable, and Active Bets
+      const creditEl = document.querySelector(".user-credit");
+      const balanceEl = document.querySelector(".user-balance");
+      const liableEl = document.querySelector(".user-liable");
+      const betsEl = document.querySelector(".user-bets");
+
+      if (creditEl) creditEl.textContent = `Credit: ${user.credit ?? 0}`;
+      if (balanceEl) balanceEl.textContent = `Balance: ${Math.floor(user.wallet_balance ?? 0)}`;
+      if (liableEl) liableEl.textContent = `Liable: ${Math.floor(user.liable ?? 0)}`;
+      if (betsEl) betsEl.textContent = `Active Bets: ${user.active_bets ?? 0}`;
+    }
+
+  } catch (err) {
+    console.error("⚠️ Error loading latest user info:", err);
+  }
+});
+</script>
 
 
 
