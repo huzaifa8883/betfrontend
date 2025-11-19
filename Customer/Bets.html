@@ -1310,7 +1310,37 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const token = localStorage.getItem("token");
+  if (!token) return;
 
+  try {
+    const res = await fetch("http://localhost:5000/api/users/latest", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await res.json();
+
+    if (data.success && data.user) {
+      const user = data.user;
+
+      // Username ko button me update karo
+      const userBtn = document.getElementById("navbar-user");
+      if (userBtn) userBtn.innerHTML = `${user.username} (${user.role})<i class="fas fa-caret-down"></i>`;
+
+      // Wallet balance update
+      const walletBalance = document.querySelector(".wallet-balance");
+     if (walletBalance) walletBalance.textContent = `B: ${Math.floor(user.wallet_balance ?? 0)}`;
+
+      // Wallet exposure update
+      const walletExposure = document.querySelector(".wallet-exposure");
+      if (walletExposure) walletExposure.textContent = ` | L: -${Math.floor(user.liable ?? 0)}`;
+    }
+  } catch (err) {
+    console.error("Error loading latest user info:", err);
+  }
+});
+</script>
 
 
     <script>
