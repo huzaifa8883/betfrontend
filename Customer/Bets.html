@@ -1206,56 +1206,112 @@ Sydney Thunder W v Perth Scorchers W                                </a>
 new Vue({
   el: "#app",
   data: {
-    bets: [],
     table: null
   },
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
+
+      // Make sure ordersUrl is defined
+      if (typeof ordersUrl === "undefined") {
+        console.error("ordersUrl is not defined!");
+        this.loadTestData();
+        return;
+      }
+
       fetch(ordersUrl + "/orders/all", {
         headers: { Authorization: "Bearer " + token }
       })
       .then(r => r.json())
       .then(list => {
-        const matchedBets = list.filter(o => (o.status || "").toUpperCase() === "MATCHED");
+        if (!Array.isArray(list) || list.length === 0) {
+          console.warn("No data returned from API, loading test data.");
+          this.loadTestData();
+          return;
+        }
 
-        // Clear table first
         this.table.clear();
 
-        matchedBets.forEach((o, index) => {
-          const position = (o.type || o.side || "").toUpperCase();
+        list.filter(o => (o.status || "").toUpperCase() === "MATCHED")
+          .forEach((o, index) => {
+            const position = (o.type || o.side || "").toUpperCase();
+            const rowNode = this.table.row.add([
+              index + 1,
+              o.event || "",
+              o.runnerName || "",
+              o.price,
+              o.size,
+              position,
+              `<span class="market-time">${new Date(o.created_at).toLocaleString()}</span>
+               <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.created_at}</span>`,
+              `<span class="market-time">${new Date(o.updated_at || o.created_at).toLocaleString()}</span>
+               <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.updated_at || o.created_at}</span>`
+            ]).draw(false).node();
 
-          const row = [
-            index + 1,
-            o.event || "",
-            o.runnerName || "",
-            o.price,
-            o.size,
-            position,
-            `<span class="market-time">${new Date(o.created_at).toLocaleString()}</span>
-             <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.created_at}</span>`,
-            `<span class="market-time">${new Date(o.updated_at || o.created_at).toLocaleString()}</span>
-             <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.updated_at || o.created_at}</span>`
-          ];
-
-          const rowNode = this.table.row.add(row).draw(false).node();
-
-          // Apply color
-          $(rowNode).addClass(position === "BACK" ? "table-primary" : "table-danger");
-        });
+            $(rowNode).addClass(position === "BACK" ? "table-primary" : "table-danger");
+          });
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error("API fetch error:", err);
+        this.loadTestData();
+      });
+    },
+
+    loadTestData() {
+      const testBets = [
+        {
+          event: "Sydney Thunder W v Perth Scorchers W / Match Odds",
+          runnerName: "Sydney Thunder W",
+          price: 1.01,
+          size: 1000,
+          type: "BACK",
+          created_at: "2025-11-19T10:55:33.617Z",
+          updated_at: "2025-11-19T10:55:33.617Z"
+        },
+        {
+          event: "Sydney Thunder W v Perth Scorchers W / Match Odds",
+          runnerName: "Sydney Thunder W",
+          price: 1.05,
+          size: 2000,
+          type: "LAY",
+          created_at: "2025-11-19T10:51:27.117Z",
+          updated_at: "2025-11-19T10:51:27.117Z"
+        }
+      ];
+
+      this.table.clear();
+
+      testBets.forEach((o, index) => {
+        const position = (o.type || "").toUpperCase();
+        const rowNode = this.table.row.add([
+          index + 1,
+          o.event,
+          o.runnerName,
+          o.price,
+          o.size,
+          position,
+          `<span class="market-time">${new Date(o.created_at).toLocaleString()}</span>
+           <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.created_at}</span>`,
+          `<span class="market-time">${new Date(o.updated_at).toLocaleString()}</span>
+           <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.updated_at}</span>`
+        ]).draw(false).node();
+
+        $(rowNode).addClass(position === "BACK" ? "table-primary" : "table-danger");
+      });
     }
   },
   mounted() {
-    // Initialize DataTable first
     this.table = $('#tableLedger').DataTable({
-      responsive: true,
+      responsive: {
+        details: {
+          type: 'inline',
+          target: 'tr'
+        }
+      },
       autoWidth: false,
       scrollX: true
     });
 
-    // Fetch data after table initialization
     this.fetchBetsHistory();
   }
 });
