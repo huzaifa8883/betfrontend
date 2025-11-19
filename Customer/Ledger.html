@@ -591,41 +591,40 @@
 </div>
 
 </div>
-<div id="ledgerApp" class="table-wrap">
-  <div>
-    <div class="card">
-      <div class="card-header">
-        <i class="fa fa-align-justify"></i> Account Ledger
-      </div>
-      <div class="card-body">
-        <table id="tableLedger" class="table table-striped table-bordered">
-          <thead>
+<div id="ledgerApp" class="col-sm-12">
+    <table id="tableLedger" class="table table-striped table-bordered dataTable" style="width:100%;">
+        <thead>
             <tr>
-              <th>#</th>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Amount</th>
-              <th>Balance</th>
+                <th>#</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Balance</th>
             </tr>
-          </thead>
-          <tbody>
-         <tr v-for="(row, i) in ledger" :key="i">
-  <td>{{ i + 1 }}</td>
-  <td>{{ row.date }}</td>
-  <td :style="{ color: row.description !== 'Opening Balance' ? '#00b181' : '#00b181' }">
-    {{ row.description }}
-  </td>
-  <td :class="{'text-success': row.amount > 0, 'text-danger': row.amount < 0}">
-    {{ row.amount.toLocaleString() }}
-  </td>
-  <td>{{ row.balance.toLocaleString() }}</td>
-</tr>
-
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+        </thead>
+        <tbody>
+            <tr v-for="(row, i) in ledger" :key="i">
+                <td class="dt-type-numeric">{{ i + 1 }}</td>
+                <td class="dt-type-date">
+                    <span class="market-time">{{ row.date }}</span>
+                    <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">
+                        {{ row.dateUTC }}
+                    </span>
+                </td>
+                <td>
+                    <a href="#" @click.prevent="popupReport(row.id, row.clientId)">
+                        {{ row.description }}
+                    </a>
+                </td>
+                <td class="dt-type-numeric" :class="{'text-success': row.amount > 0, 'text-danger': row.amount < 0}">
+                    {{ row.amount.toLocaleString() }}
+                </td>
+                <td class="dt-type-numeric">
+                    {{ row.balance.toLocaleString() }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 <script>
     function popup_report(vid, aid) {
