@@ -662,6 +662,7 @@
 
 
 
+
         </div>
       </div>
     </div>
@@ -787,32 +788,50 @@
 
 <script>
 new Vue({
-  el: "#app",
+  el: '#app',
   data: {
     bets: []
   },
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token not found");
+        return;
+      }
+
       fetch(ordersUrl + "/orders/all", {
-        headers: { Authorization: "Bearer " + token }
+        headers: { "Authorization": "Bearer " + token }
       })
       .then(r => r.json())
       .then(list => {
-        this.bets = list
-          .filter(o => (o.status || "").toUpperCase() === "MATCHED")
-          .map((o, index) => ({
-            index: index + 1,
-            event: o.event || "",
-            runner: o.runnerName || "",
-            price: o.price,
-            amount: o.size,
-            position: (o.type || o.side || "").toUpperCase(),
-            placed: new Date(o.created_at).toLocaleString(),
-            updated: new Date(o.updated_at || o.created_at).toLocaleString()
-          }));
+        if (!Array.isArray(list)) list = [];
+
+        // ⚡ Display all bets (remove filter if you want only active)
+        this.bets = list.map((o, index) => ({
+          index: index + 1,
+          event: o.event || "-",
+          runner: o.runnerName || "-",
+          price: o.price || 0,
+          amount: o.size || 0,
+          position: (o.position || o.type || o.side || "").toUpperCase(),
+          placed: o.created_at ? new Date(o.created_at).toLocaleString() : "-",
+          updated: o.updated_at ? new Date(o.updated_at).toLocaleString() : "-"
+        }));
+
+        // Initialize DataTable after Vue updates DOM
+        this.$nextTick(() => {
+          if ($.fn.dataTable.isDataTable('#tableLedger')) {
+            $('#tableLedger').DataTable().clear().destroy();
+          }
+          $('#tableLedger').DataTable({
+            responsive: true,
+            autoWidth: false,
+            scrollX: true
+          });
+        });
       })
-      .catch(err => console.error(err));
+      .catch(err => console.error("Error fetching bets history:", err));
     }
   },
   mounted() {
