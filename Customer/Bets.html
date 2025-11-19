@@ -1056,32 +1056,29 @@ Sydney Thunder W v Perth Scorchers W                                </a>
         <div class="card">
             <div class="card-header">
                 <i class="fa fa-align-justify"></i>
-                Bets History <b>   </b>
+                Bets History
             </div>
             <div class="card-body">
                 <p>
                     <a href="/Customer/StarOrders">Star Casino</a>
                 </p>
-             <div id="app" class="col-sm-12">
-  <div class="table-responsive">
-    <table id="tableLedger" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%;">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Event</th>
-          <th>Runner</th>
-          <th>Price</th>
-          <th>Amount</th>
-          <th>Position</th>
-          <th>Placed</th>
-          <th>Updated</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
+                <table id="tableLedger" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Event</th>
+                            <th>Runner</th>
+                            <th>Price</th>
+                            <th>Amount</th>
+                            <th>Position</th>
+                            <th>Placed</th>
+                            <th>Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -1195,127 +1192,6 @@ Sydney Thunder W v Perth Scorchers W                                </a>
                 <div class="col-md-4"></div>`);
     });
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
-
-<script>
-new Vue({
-  el: "#app",
-  data: {
-    table: null
-  },
-  methods: {
-    fetchBetsHistory() {
-      const token = localStorage.getItem("token");
-
-      // Make sure ordersUrl is defined
-      if (typeof ordersUrl === "undefined") {
-        console.error("ordersUrl is not defined!");
-        this.loadTestData();
-        return;
-      }
-
-      fetch(ordersUrl + "/orders/all", {
-        headers: { Authorization: "Bearer " + token }
-      })
-      .then(r => r.json())
-      .then(list => {
-        if (!Array.isArray(list) || list.length === 0) {
-          console.warn("No data returned from API, loading test data.");
-          this.loadTestData();
-          return;
-        }
-
-        this.table.clear();
-
-        list.filter(o => (o.status || "").toUpperCase() === "MATCHED")
-          .forEach((o, index) => {
-            const position = (o.type || o.side || "").toUpperCase();
-            const rowNode = this.table.row.add([
-              index + 1,
-              o.event || "",
-              o.runnerName || "",
-              o.price,
-              o.size,
-              position,
-              `<span class="market-time">${new Date(o.created_at).toLocaleString()}</span>
-               <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.created_at}</span>`,
-              `<span class="market-time">${new Date(o.updated_at || o.created_at).toLocaleString()}</span>
-               <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.updated_at || o.created_at}</span>`
-            ]).draw(false).node();
-
-            $(rowNode).addClass(position === "BACK" ? "table-primary" : "table-danger");
-          });
-      })
-      .catch(err => {
-        console.error("API fetch error:", err);
-        this.loadTestData();
-      });
-    },
-
-    loadTestData() {
-      const testBets = [
-        {
-          event: "Sydney Thunder W v Perth Scorchers W / Match Odds",
-          runnerName: "Sydney Thunder W",
-          price: 1.01,
-          size: 1000,
-          type: "BACK",
-          created_at: "2025-11-19T10:55:33.617Z",
-          updated_at: "2025-11-19T10:55:33.617Z"
-        },
-        {
-          event: "Sydney Thunder W v Perth Scorchers W / Match Odds",
-          runnerName: "Sydney Thunder W",
-          price: 1.05,
-          size: 2000,
-          type: "LAY",
-          created_at: "2025-11-19T10:51:27.117Z",
-          updated_at: "2025-11-19T10:51:27.117Z"
-        }
-      ];
-
-      this.table.clear();
-
-      testBets.forEach((o, index) => {
-        const position = (o.type || "").toUpperCase();
-        const rowNode = this.table.row.add([
-          index + 1,
-          o.event,
-          o.runnerName,
-          o.price,
-          o.size,
-          position,
-          `<span class="market-time">${new Date(o.created_at).toLocaleString()}</span>
-           <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.created_at}</span>`,
-          `<span class="market-time">${new Date(o.updated_at).toLocaleString()}</span>
-           <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.updated_at}</span>`
-        ]).draw(false).node();
-
-        $(rowNode).addClass(position === "BACK" ? "table-primary" : "table-danger");
-      });
-    }
-  },
-  mounted() {
-    this.table = $('#tableLedger').DataTable({
-      responsive: {
-        details: {
-          type: 'inline',
-          target: 'tr'
-        }
-      },
-      autoWidth: false,
-      scrollX: true
-    });
-
-    this.fetchBetsHistory();
-  }
-});
-</script>
 
             </center>
            
@@ -1334,6 +1210,55 @@ new Vue({
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    
+<!-- jQuery & DataTables -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    const table = $('#tableLedger').DataTable({
+        responsive: true,
+        autoWidth: false,
+        scrollX: true
+    });
+
+    const token = localStorage.getItem("token");
+
+    fetch(ordersUrl + "/orders/all", {
+        headers: { Authorization: "Bearer " + token }
+    })
+    .then(res => res.json())
+    .then(data => {
+        const matchedBets = data.filter(o => (o.status || "").toUpperCase() === "MATCHED");
+
+        matchedBets.forEach((bet, index) => {
+            const position = (bet.type || bet.side || "").toUpperCase();
+            const rowClass = position === "BACK" ? "table-primary" : "table-danger";
+
+            table.row.add([
+                index + 1,
+                bet.event || "",
+                bet.runnerName || "",
+                bet.price,
+                bet.size,
+                position,
+                `<span class="market-time">${new Date(bet.created_at).toLocaleString()}</span>
+                 <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${bet.created_at}</span>`,
+                `<span class="market-time">${new Date(bet.updated_at || bet.created_at).toLocaleString()}</span>
+                 <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${bet.updated_at || bet.created_at}</span>`
+            ])
+            .draw(false)
+            .node()
+            .classList.add(rowClass);
+        });
+    })
+    .catch(err => console.error("Error fetching bets:", err));
+});
+</script>
     <script>
         $(document).ready(function () {
             $("#tableLedger").DataTable({
