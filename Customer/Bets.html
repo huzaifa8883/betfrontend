@@ -789,23 +789,24 @@ new Vue({
       .then(r => r.json())
       .then(list => {
 
-        // ✔ Case-insensitive MATCHED filter
-        const matchedBets = list.filter(o => 
-          (o.status || "").toUpperCase() === "MATCHED"
-        );
+        // 🩵 Sirf Matched bets (case-insensitive)
+        const matchedBets = list.filter(o => {
+          const s = (o.status || "").toLowerCase();
+          return s === "matched";        // <-- this is correct
+        });
 
         this.bets = matchedBets.map((o, index) => ({
           index: index + 1,
-          event: o.event || "-",
-          runner: o.runnerName || "-",
-          price: o.price || 0,
-          amount: o.size || 0,
-          position: (o.type || "").toUpperCase(),
-          placed: o.created_at ? new Date(o.created_at).toLocaleString() : "-",
-          updated: o.updated_at ? new Date(o.updated_at).toLocaleString() : "-"
+          event: o.event,
+          runner: o.runnerName,
+          price: o.price,
+          amount: o.size,
+          position: (o.type || o.side || "").toUpperCase(),
+          placed: new Date(o.created_at).toLocaleString(),
+          updated: new Date(o.updated_at || o.created_at).toLocaleString()
         }));
 
-        // DataTable init AFTER rows added
+        // DataTable init AFTER table update
         this.$nextTick(() => {
           if ($.fn.dataTable.isDataTable('#tableLedger')) {
             $('#tableLedger').DataTable().clear().destroy();
@@ -826,7 +827,6 @@ new Vue({
   }
 });
 </script>
-
 
 
     <script type="text/javascript" src="https://wurfl.io/wurfl.js"></script>
