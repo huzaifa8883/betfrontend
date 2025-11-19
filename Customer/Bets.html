@@ -782,29 +782,30 @@ new Vue({
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
+
       return fetch(ordersUrl + "/orders/all", {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(r => r.json())
       .then(list => {
-        // 🩵 Sirf active bets rakho (jo CLOSED/SETTLED nahi hain)
-        const activeBets = list.filter(o => o.status !== "CLOSED" && o.status !== "SETTLED");
 
-        this.bets = activeBets.map((o, index) => ({
+        // ✔ Case-insensitive MATCHED filter
+        const matchedBets = list.filter(o => 
+          (o.status || "").toUpperCase() === "MATCHED"
+        );
+
+        this.bets = matchedBets.map((o, index) => ({
           index: index + 1,
-          event: o.event,
-          runner: o.runnerName,
-          price: o.price,
-          amount: o.size,
+          event: o.event || "-",
+          runner: o.runnerName || "-",
+          price: o.price || 0,
+          amount: o.size || 0,
           position: (o.type || "").toUpperCase(),
-          placed: new Date(o.created_at).toLocaleString(),
-          updated: o.status === "MATCHED"
-            ? new Date(o.updated_at || o.created_at).toLocaleString()
-            : "-"
+          placed: o.created_at ? new Date(o.created_at).toLocaleString() : "-",
+          updated: o.updated_at ? new Date(o.updated_at).toLocaleString() : "-"
         }));
-      
 
-        // DataTable init
+        // DataTable init AFTER rows added
         this.$nextTick(() => {
           if ($.fn.dataTable.isDataTable('#tableLedger')) {
             $('#tableLedger').DataTable().clear().destroy();
@@ -819,11 +820,13 @@ new Vue({
       .catch(err => console.error("Error fetching bets history:", err));
     }
   },
+
   mounted() {
     this.fetchBetsHistory();
   }
 });
 </script>
+
 
 
     <script type="text/javascript" src="https://wurfl.io/wurfl.js"></script>
