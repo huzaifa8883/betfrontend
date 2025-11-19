@@ -788,12 +788,15 @@ new Vue({
       })
       .then(r => r.json())
       .then(list => {
+      console.log(list)
+
 
         // 🩵 Sirf Matched bets (case-insensitive)
         const matchedBets = list.filter(o => {
           const s = (o.status || "").toLowerCase();
           return s === "matched";        // <-- this is correct
         });
+        console.log(matchedBets)
 
         this.bets = matchedBets.map((o, index) => ({
           index: index + 1,
