@@ -32,6 +32,14 @@
             font-size: 13px;
         }
     </style>
+<style>
+.table-primary {
+  background-color: #8dd2f0 !important;
+}
+.table-danger {
+  background-color: #feabb2 !important;
+}
+</style>
 
 
     <script>
@@ -621,25 +629,36 @@
             <a href="/Customer/StarOrders">Star Casino</a>
           </p>
 <div id="app" class="col-sm-12">
-  <table id="tableLedger"
-         class="table table-striped table-bordered dt-responsive nowrap"
-         style="width:100%">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Event</th>
-        <th>Runner</th>
-        <th>Price</th>
-        <th>Amount</th>
-        <th>Position</th>
-        <th>Placed</th>
-        <th>Updated</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="table-responsive">
+    <table id="tableLedger" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Event</th>
+          <th>Runner</th>
+          <th>Price</th>
+          <th>Amount</th>
+          <th>Position</th>
+          <th>Placed</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="bet in bets" :key="bet.index"
+            :style="{ backgroundColor: bet.position === 'BACK' ? '#8dd2f0' : '#feabb2' }">
+          <td>{{ bet.index }}</td>
+          <td>{{ bet.event }}</td>
+          <td>{{ bet.runner }}</td>
+          <td>{{ bet.price }}</td>
+          <td>{{ bet.amount }}</td>
+          <td>{{ bet.position }}</td>
+          <td>{{ bet.placed }}</td>
+          <td>{{ bet.updated }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
-
 
 
 
@@ -766,7 +785,6 @@
     <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
 
 
-
 <script>
 new Vue({
   el: "#app",
@@ -774,7 +792,6 @@ new Vue({
     bets: [],
     table: null
   },
-
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
@@ -794,64 +811,32 @@ new Vue({
             runner: o.runnerName || "",
             price: o.price,
             amount: o.size,
-            position: (o.type || o.side || "").toUpperCase(),
+            position: (o.type || o.side || "").toUpperCase(), // BACK or LAY
             placed: new Date(o.created_at).toLocaleString(),
             updated: new Date(o.updated_at || o.created_at).toLocaleString()
           }));
 
-          this.updateTable();
-        });
-    },
-
-    updateTable() {
-      if (!this.table) return;
-
-      this.table.clear();
-
-      this.bets.forEach(bet => {
-        this.table.row.add([
-          bet.index,
-          bet.event,
-          bet.runner,
-          bet.price,
-          bet.amount,
-          bet.position,
-          bet.placed,
-          bet.updated
-        ]);
-      });
-
-      this.table.draw();
+          this.$nextTick(() => {
+            // Re-init DataTable after Vue renders
+            if ($.fn.dataTable.isDataTable("#tableLedger")) {
+              $("#tableLedger").DataTable().destroy();
+            }
+            this.table = $("#tableLedger").DataTable({
+              responsive: true,
+              autoWidth: false,
+              scrollX: true
+            });
+          });
+        })
+        .catch(err => console.error(err));
     }
   },
-
   mounted() {
-    this.table = $("#tableLedger").DataTable({
-      responsive: true,
-      autoWidth: false,
-      scrollX: true,
-
-      columnDefs: [
-        { targets: [4, 5, 6, 7], visible: false } // hide in desktop, show in mobile child
-      ],
-
-      rowCallback: function (row, data) {
-        const position = data[5];
-
-        if (position === "BACK") {
-          $(row).addClass("table-primary"); // or color
-          $(row).css("background-color", "#bbdaff");
-        } else if (position === "LAY") {
-          $(row).addClass("table-danger");
-          $(row).css("background-color", "#f5c6cb");
-        }
-      }
-    });
-
     this.fetchBetsHistory();
   }
 });
 </script>
+
 
 
     <script type="text/javascript" src="https://wurfl.io/wurfl.js"></script>
