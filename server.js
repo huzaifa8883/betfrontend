@@ -82,7 +82,7 @@ app.get("/Reports/Commission", (req, res) => {
   res.sendFile(path.join(__dirname, "Reports", "Commission.html"));
 });
 app.get("/customer/wallet", (req, res) => {
-  res.sendFile(path.join(__dirname, "Customer", "wallet.html"));
+  res.sendFile(path.join(__dirname, "Customer", "Wallet.html"));
 });
 app.get("/customer/Ledger", (req, res) => {
   res.sendFile(path.join(__dirname, "Customer", "Ledger.html"));
