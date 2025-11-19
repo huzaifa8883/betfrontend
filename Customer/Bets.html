@@ -789,46 +789,30 @@
 new Vue({
   el: "#app",
   data: {
-    bets: [],
-    table: null
+    bets: []
   },
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
-
       fetch(ordersUrl + "/orders/all", {
         headers: { Authorization: "Bearer " + token }
       })
-        .then(r => r.json())
-        .then(list => {
-          const matchedBets = list.filter(o =>
-            (o.status || "").toUpperCase() === "MATCHED"
-          );
-
-          this.bets = matchedBets.map((o, index) => ({
+      .then(r => r.json())
+      .then(list => {
+        this.bets = list
+          .filter(o => (o.status || "").toUpperCase() === "MATCHED")
+          .map((o, index) => ({
             index: index + 1,
             event: o.event || "",
             runner: o.runnerName || "",
             price: o.price,
             amount: o.size,
-            position: (o.type || o.side || "").toUpperCase(), // BACK or LAY
+            position: (o.type || o.side || "").toUpperCase(),
             placed: new Date(o.created_at).toLocaleString(),
             updated: new Date(o.updated_at || o.created_at).toLocaleString()
           }));
-
-          this.$nextTick(() => {
-            // Re-init DataTable after Vue renders
-            if ($.fn.dataTable.isDataTable("#tableLedger")) {
-              $("#tableLedger").DataTable().destroy();
-            }
-            this.table = $("#tableLedger").DataTable({
-              responsive: true,
-              autoWidth: false,
-              scrollX: true
-            });
-          });
-        })
-        .catch(err => console.error(err));
+      })
+      .catch(err => console.error(err));
     }
   },
   mounted() {
