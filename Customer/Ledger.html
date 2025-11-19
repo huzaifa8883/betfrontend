@@ -799,7 +799,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 const baseUrl = "https://bettingbackending.work.gd/api";
 const ordersurl = baseUrl + "/orders";
 const usersUrl = baseUrl + "/users";
-const transactionsUrl = baseUrl + "/orders/transactions"; // deposit transactions route
+const transactionsUrl = baseUrl + "/orders/transactions";
 
 new Vue({
   el: "#ledgerApp",
@@ -813,7 +813,7 @@ new Vue({
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        // Step 1: Get current user
+        // Fetch user info
         const userRes = await fetch(usersUrl + "/me", {
           headers: { "Authorization": "Bearer " + token }
         });
@@ -821,17 +821,15 @@ new Vue({
         const userId = userData?.user?._id;
         const username = userData?.user?.username;
 
-        // Step 2: Get deposit transactions
+        // Fetch deposit transactions
         const transRes = await fetch(transactionsUrl, {
           headers: { "Authorization": "Bearer " + token }
         });
         const allTrans = await transRes.json();
-
         const deposits = allTrans.filter(
           t => t.type === "deposit" && t.to_user_id === userId && t.status === "completed"
         );
 
-        // Step 3: Build ledger starting with 0 Opening Balance
         let runningBalance = 0;
         const ledgerRows = [
           {
@@ -842,7 +840,7 @@ new Vue({
           }
         ];
 
-        // Add deposits after Opening Balance
+        // Add deposits
         for (const dep of deposits) {
           runningBalance += Number(dep.amount || 0);
           ledgerRows.push({
@@ -853,20 +851,17 @@ new Vue({
           });
         }
 
-        // Set openingBalance = total deposits
         this.openingBalance = runningBalance;
 
-        // Step 4: Fetch all bets
+        // Fetch bets
         const res = await fetch(ordersurl + "/all", {
           headers: { "Authorization": "Bearer " + token }
         });
         const allOrders = await res.json();
-
         const settledBets = allOrders
           .filter(o => o.status === "SETTLED")
           .sort((a, b) => new Date(a.settled_at || a.updated_at) - new Date(b.settled_at || b.updated_at));
 
-        // Step 5: Add settled bets
         for (const bet of settledBets) {
           const price = Number(bet.price);
           const size = Number(bet.size);
@@ -888,15 +883,24 @@ new Vue({
           });
         }
 
-        // Step 6: Adjust running balance for pending (liable) bets only
         if (userData?.user?.liable) {
           runningBalance -= Number(userData.user.liable);
         }
 
         this.ledger = ledgerRows;
 
-        console.log("🪙 Opening Balance (0):", 0);
-        console.log("💰 Running Balance after settled + liable:", runningBalance);
+        // Initialize DataTable after ledger is updated
+        this.$nextTick(() => {
+          if ($.fn.dataTable.isDataTable("#tableLedger")) {
+            $("#tableLedger").DataTable().destroy();
+          }
+          $("#tableLedger").DataTable({
+            responsive: true,
+            autoWidth: false,
+            scrollX: true,
+            order: [[0, "asc"]],
+          });
+        });
 
       } catch (err) {
         console.error("Error fetching ledger:", err);
