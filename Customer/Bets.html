@@ -634,22 +634,11 @@
           <th>Updated</th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="bet in bets" :key="bet.index"
-            :style="{ backgroundColor: bet.position === 'BACK' ? '#8dd2f0' : '#feabb2' }">
-          <td>{{ bet.index }}</td>
-          <td>{{ bet.event }}</td>
-          <td>{{ bet.runner }}</td>
-          <td>{{ bet.price }}</td>
-          <td>{{ bet.amount }}</td>
-          <td>{{ bet.position }}</td>
-          <td>{{ bet.placed }}</td>
-          <td>{{ bet.updated }}</td>
-        </tr>
-      </tbody>
+      <tbody></tbody>
     </table>
   </div>
 </div>
+
 
 
 
@@ -777,27 +766,28 @@
 new Vue({
   el: '#app',
   data: {
-    bets: []
+    bets: [],
+    table: null
   },
+
   methods: {
     fetchBetsHistory() {
       const token = localStorage.getItem("token");
 
-      return fetch(ordersUrl + "/orders/all", {
+      fetch(ordersUrl + "/orders/all", {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(r => r.json())
       .then(list => {
-      console.log(list)
+        console.log("ALL BETS:", list);
 
+        const matchedBets = list.filter(o =>
+          (o.status || "").toUpperCase() === "MATCHED"
+        );
 
-        // 🩵 Sirf Matched bets (case-insensitive)
-        const matchedBets = list.filter(o => {
-          const s = (o.status || "").toLowerCase();
-          return s === "matched";        // <-- this is correct
-        });
-        console.log(matchedBets)
+        console.log("MATCHED BETS:", matchedBets);
 
+        // Vue object
         this.bets = matchedBets.map((o, index) => ({
           index: index + 1,
           event: o.event,
@@ -809,27 +799,46 @@ new Vue({
           updated: new Date(o.updated_at || o.created_at).toLocaleString()
         }));
 
-        // DataTable init AFTER table update
-        this.$nextTick(() => {
-          if ($.fn.dataTable.isDataTable('#tableLedger')) {
-            $('#tableLedger').DataTable().clear().destroy();
-          }
-          $('#tableLedger').DataTable({
-            responsive: true,
-            autoWidth: false,
-            scrollX: true
-          });
-        });
+        // Update DataTable rows
+        this.updateTable();
       })
-      .catch(err => console.error("Error fetching bets history:", err));
+      .catch(err => console.error(err));
+    },
+
+    updateTable() {
+      if (!this.table) return;
+
+      this.table.clear();
+
+      this.bets.forEach(bet => {
+        this.table.row.add([
+          bet.index,
+          bet.event,
+          bet.runner,
+          bet.price,
+          bet.amount,
+          bet.position,
+          bet.placed,
+          bet.updated
+        ]);
+      });
+
+      this.table.draw();
     }
   },
 
   mounted() {
+    this.table = $('#tableLedger').DataTable({
+      responsive: true,
+      autoWidth: false,
+      scrollX: true
+    });
+
     this.fetchBetsHistory();
   }
 });
 </script>
+
 
 
     <script type="text/javascript" src="https://wurfl.io/wurfl.js"></script>
