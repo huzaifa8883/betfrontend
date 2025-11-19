@@ -783,27 +783,22 @@ new Vue({
       })
       .then(r => r.json())
       .then(list => {
-        console.log("ALL BETS:", list);
 
         const matchedBets = list.filter(o =>
           (o.status || "").toUpperCase() === "MATCHED"
         );
 
-        console.log("MATCHED BETS:", matchedBets);
-
-        // Vue object
         this.bets = matchedBets.map((o, index) => ({
           index: index + 1,
-          event: o.event,
-          runner: o.runnerName,
+          event: o.event || "",
+          runner: o.runnerName || "",
           price: o.price,
           amount: o.size,
-          position: (o.type || o.side || "").toUpperCase(),
+          position: (o.type || o.side || "").toUpperCase(), // BACK or LAY
           placed: new Date(o.created_at).toLocaleString(),
           updated: new Date(o.updated_at || o.created_at).toLocaleString()
         }));
 
-        // Update DataTable rows
         this.updateTable();
       })
       .catch(err => console.error(err));
@@ -832,17 +827,27 @@ new Vue({
   },
 
   mounted() {
+    // INIT DATATABLE WITH ROW COLORS
     this.table = $('#tableLedger').DataTable({
       responsive: true,
       autoWidth: false,
-      scrollX: true
+      scrollX: true,
+
+      rowCallback: function(row, data) {
+        const position = data[5]; // BACK / LAY
+
+        if (position === "BACK") {
+          $(row).css("background-color", "#bbdaff");
+        } else if (position === "LAY") {
+          $(row).css("background-color", "#f5c6cb");
+        }
+      }
     });
 
     this.fetchBetsHistory();
   }
 });
 </script>
-
 
 
     <script type="text/javascript" src="https://wurfl.io/wurfl.js"></script>
