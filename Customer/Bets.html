@@ -1206,13 +1206,10 @@ Sydney Thunder W v Perth Scorchers W                                </a>
         const reft = getCookie('wex3reftoken');
     </script>
 
-    
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-    
-<!-- jQuery & DataTables -->
+    <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables CSS & JS (latest compatible) -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
@@ -1220,12 +1217,24 @@ Sydney Thunder W v Perth Scorchers W                                </a>
 
 <script>
 $(document).ready(function() {
+    // Initialize DataTable once
     const table = $('#tableLedger').DataTable({
-        responsive: true,
+        responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.childRowImmediate,
+                type: 'none'
+            }
+        },
         autoWidth: false,
-        scrollX: true
+        scrollX: true,
+        order: [[0, 'asc']],
+        columnDefs: [
+            { responsivePriority: 1, targets: 0 },
+            { responsivePriority: 2, targets: 2 }
+        ]
     });
 
+    // Fetch API data and populate table
     const token = localStorage.getItem("token");
 
     fetch(ordersUrl + "/orders/all", {
@@ -1239,7 +1248,7 @@ $(document).ready(function() {
             const position = (bet.type || bet.side || "").toUpperCase();
             const rowClass = position === "BACK" ? "table-primary" : "table-danger";
 
-            table.row.add([
+            const rowNode = table.row.add([
                 index + 1,
                 bet.event || "",
                 bet.runnerName || "",
@@ -1250,33 +1259,15 @@ $(document).ready(function() {
                  <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${bet.created_at}</span>`,
                 `<span class="market-time">${new Date(bet.updated_at || bet.created_at).toLocaleString()}</span>
                  <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${bet.updated_at || bet.created_at}</span>`
-            ])
-            .draw(false)
-            .node()
-            .classList.add(rowClass);
+            ]).draw(false).node();
+
+            $(rowNode).addClass(rowClass);
         });
     })
     .catch(err => console.error("Error fetching bets:", err));
 });
 </script>
-    <script>
-        $(document).ready(function () {
-            $("#tableLedger").DataTable({
-                "order": [[0, "asc"]],
-                responsive: {
-                    details: {
-                        display: $.fn.dataTable.Responsive.display.childRowImmediate,
-                        type: 'none',
-                        target: ''
-                    }
-                },
-                columnDefs: [
-                    { responsivePriority: 1, targets: 0 },
-                    { responsivePriority: 2, targets: 2 }
-                ]
-            });
-        });
-    </script>
+
 
 
     <script>
