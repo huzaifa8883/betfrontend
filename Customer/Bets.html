@@ -1062,62 +1062,26 @@ Sydney Thunder W v Perth Scorchers W                                </a>
                 <p>
                     <a href="/Customer/StarOrders">Star Casino</a>
                 </p>
-                <table id="tableLedger" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Event</th>
-                            <th>Runner</th>
-                            <th>Price</th>
-                            <th>Amount</th>
-                            <th>Position</th>
-                            <th>Placed</th>
-                            <th>Updated</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                                <tr class="table-danger" id="bet_d98de91e-38e2-4dd8-aa12-b2233304a13f">
-                                    <td>1</td>
-                                    <td>Sydney Thunder W v Perth Scorchers W / Match Odds</td>
-                                    <td>Sydney Thunder W</td>
-                                    <td>1.0100</td>
-                                    <td>1,000</td>
-                                    <td>0</td>
-                                    <td>
-<span class="market-time"></span>
-<span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">
-    2025-11-19T10:55:33.6170000Z
-</span>
-</td>
-                                    <td>
-<span class="market-time"></span>
-<span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">
-    2025-11-19T10:55:33.6170000Z
-</span>
-</td>
-                                </tr>
-                                <tr class="table-primary" id="bet_24f71f57-9fd0-46e4-b50d-521682e6f928">
-                                    <td>2</td>
-                                    <td>Sydney Thunder W v Perth Scorchers W / Match Odds</td>
-                                    <td>Sydney Thunder W</td>
-                                    <td>1.0500</td>
-                                    <td>2,000</td>
-                                    <td>0</td>
-                                    <td>
-<span class="market-time"></span>
-<span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">
-    2025-11-19T10:51:27.1170000Z
-</span>
-</td>
-                                    <td>
-<span class="market-time"></span>
-<span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">
-    2025-11-19T10:51:27.1170000Z
-</span>
-</td>
-                                </tr>
-                    </tbody>
-                </table>
+                <div id="app" class="col-sm-12">
+  <div class="table-responsive">
+    <table id="tableLedger" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Event</th>
+          <th>Runner</th>
+          <th>Price</th>
+          <th>Amount</th>
+          <th>Position</th>
+          <th>Placed</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
             </div>
         </div>
     </div>
@@ -1230,6 +1194,73 @@ Sydney Thunder W v Perth Scorchers W                                </a>
                 <div class="col-sm-12 col-md-4"></div>
                 <div class="col-md-4"></div>`);
     });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script>
+new Vue({
+  el: "#app",
+  data: {
+    bets: [],
+    table: null
+  },
+  methods: {
+    fetchBetsHistory() {
+      const token = localStorage.getItem("token");
+      fetch(ordersUrl + "/orders/all", {
+        headers: { Authorization: "Bearer " + token }
+      })
+      .then(r => r.json())
+      .then(list => {
+        const matchedBets = list.filter(o =>
+          (o.status || "").toUpperCase() === "MATCHED"
+        );
+
+        if (this.table) {
+          this.table.clear();
+        }
+
+        matchedBets.forEach((o, index) => {
+          const position = (o.type || o.side || "").toUpperCase();
+          const rowNode = this.table.row.add([
+            index + 1,
+            o.event || "",
+            o.runnerName || "",
+            o.price,
+            o.size,
+            position,
+            `<span class="market-time">${new Date(o.created_at).toLocaleString()}</span>
+             <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.created_at}</span>`,
+            `<span class="market-time">${new Date(o.updated_at || o.created_at).toLocaleString()}</span>
+             <span class="d-none utctime" data-format="M/D/YYYY hh:mm:ss a" data-target="time">${o.updated_at || o.created_at}</span>`
+          ]).draw(false).node();
+
+          // Set row color based on BACK / LAY
+          $(rowNode).addClass(position === "BACK" ? "table-primary" : "table-danger");
+        });
+      })
+      .catch(err => console.error(err));
+    }
+  },
+  mounted() {
+    // Initialize DataTable with responsive plugin
+    this.table = $('#tableLedger').DataTable({
+      responsive: {
+        details: {
+          type: 'inline', // inline child rows for mobile
+          target: 'tr'
+        }
+      },
+      autoWidth: false,
+      scrollX: true
+    });
+
+    this.fetchBetsHistory();
+  }
+});
 </script>
 
             </center>
