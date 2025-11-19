@@ -15,6 +15,8 @@
     <link rel="stylesheet" type="text/css" href="/img/sprites/css/sprite.css" />
     <link rel="stylesheet" href="/dist/site.css?7200" />
     <link href="/css/BetPro-style.css?7200" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
 
     <title>Bets History | BetPro</title>
     <style>
@@ -618,25 +620,24 @@
           <p>
             <a href="/Customer/StarOrders">Star Casino</a>
           </p>
-
 <div id="app" class="col-sm-12">
-  <div class="table-responsive">
-    <table id="tableLedger" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Event</th>
-          <th>Runner</th>
-          <th>Price</th>
-          <th>Amount</th>
-          <th>Position</th>
-          <th>Placed</th>
-          <th>Updated</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <table id="tableLedger"
+         class="table table-striped table-bordered dt-responsive nowrap"
+         style="width:100%">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Event</th>
+        <th>Runner</th>
+        <th>Price</th>
+        <th>Amount</th>
+        <th>Position</th>
+        <th>Placed</th>
+        <th>Updated</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 </div>
 
 
@@ -768,7 +769,7 @@
 
 <script>
 new Vue({
-  el: '#app',
+  el: "#app",
   data: {
     bets: [],
     table: null
@@ -779,29 +780,27 @@ new Vue({
       const token = localStorage.getItem("token");
 
       fetch(ordersUrl + "/orders/all", {
-        headers: { "Authorization": "Bearer " + token }
+        headers: { Authorization: "Bearer " + token }
       })
-      .then(r => r.json())
-      .then(list => {
+        .then(r => r.json())
+        .then(list => {
+          const matchedBets = list.filter(o =>
+            (o.status || "").toUpperCase() === "MATCHED"
+          );
 
-        const matchedBets = list.filter(o =>
-          (o.status || "").toUpperCase() === "MATCHED"
-        );
+          this.bets = matchedBets.map((o, index) => ({
+            index: index + 1,
+            event: o.event || "",
+            runner: o.runnerName || "",
+            price: o.price,
+            amount: o.size,
+            position: (o.type || o.side || "").toUpperCase(),
+            placed: new Date(o.created_at).toLocaleString(),
+            updated: new Date(o.updated_at || o.created_at).toLocaleString()
+          }));
 
-        this.bets = matchedBets.map((o, index) => ({
-          index: index + 1,
-          event: o.event || "",
-          runner: o.runnerName || "",
-          price: o.price,
-          amount: o.size,
-          position: (o.type || o.side || "").toUpperCase(), // BACK or LAY
-          placed: new Date(o.created_at).toLocaleString(),
-          updated: new Date(o.updated_at || o.created_at).toLocaleString()
-        }));
-
-        this.updateTable();
-      })
-      .catch(err => console.error(err));
+          this.updateTable();
+        });
     },
 
     updateTable() {
@@ -827,18 +826,23 @@ new Vue({
   },
 
   mounted() {
-    // INIT DATATABLE WITH ROW COLORS
-    this.table = $('#tableLedger').DataTable({
+    this.table = $("#tableLedger").DataTable({
       responsive: true,
       autoWidth: false,
       scrollX: true,
 
-      rowCallback: function(row, data) {
-        const position = data[5]; // BACK / LAY
+      columnDefs: [
+        { targets: [4, 5, 6, 7], visible: false } // hide in desktop, show in mobile child
+      ],
+
+      rowCallback: function (row, data) {
+        const position = data[5];
 
         if (position === "BACK") {
+          $(row).addClass("table-primary"); // or color
           $(row).css("background-color", "#bbdaff");
         } else if (position === "LAY") {
+          $(row).addClass("table-danger");
           $(row).css("background-color", "#f5c6cb");
         }
       }
