@@ -330,50 +330,50 @@
 
 
         <li class="nav-item" style="width:100%;">
-            <a href="/Common/sap" class="dropdown-toggle" role="button">
+            <a href="/Common/sap.html" class="dropdown-toggle" role="button">
                 <span class="svg-Casino svg-Casino-dims imageSpin2" role="img"></span>
                 <span>Sports Book</span>
             </a>
         </li>
         <li class="nav-item" style="width:100%;">
-            <a href="/Common/RSC" class="dropdown-toggle" role="button">
+            <a href="/Common/RSC.html" class="dropdown-toggle" role="button">
                 <i style="font-size:17px;" class='fas fa-star fa-2x fa-spin fa-lg'></i>
                 <span>RoyalStar Casino</span>
             </a>
         </li>
         <li class="nav-item" style="width:100%;">
-            <a href="/Common/Games" class="dropdown-toggle" role="button">
+            <a href="/Common/Games.html" class="dropdown-toggle" role="button">
                 <img id="spinning-circle" src="/img/v2/livegameing.png" onerror="this.onerror = null; this.src= null" alt="G">
                 <span>Star Casino</span>
             </a>
 
         </li>
         <li class="nav-item" style="width:100%;">
-            <a class="dropdown-toggle" role="button" href="/Common/WorldCasino">
+            <a class="dropdown-toggle" role="button" href="/Common/WorldCasino.html">
                 <img id="invertcolor" style="background:invert(100%)" src="/img/v2/worldcasinosvg.png" alt="WC" />
                 <span>World Casino</span>
             </a>
         </li>
         <li class="nav-item" style="width:100%;">
-            <a class="dropdown-toggle" role="button" href="/Common/Dream">
+            <a class="dropdown-toggle" role="button" href="/Common/Dream.html">
                 <span class="svg-Casino svg-Casino-dims imageSpin2" role="img"></span>
                 <span>Royal Casino</span>
             </a>
         </li>
         <li class="nav-item" style="width:100%;">
-            <a class="dropdown-toggle" role="button" href="/Common/ExGames">
+            <a class="dropdown-toggle" role="button" href="/Common/ExGames.html">
                 <img id="invertcolor2" src="/img/v2/BLogo.png" />
                 <span>BetFairGames</span>
             </a>
          </li>
         <li class="nav-item exgameblinker" style="width:100%;">
-            <a class="dropdown-toggle" role="button" href="/Common/BetProGames">
+            <a class="dropdown-toggle" role="button" href="/Common/BetProGames.html">
                 <img id="invertcolor3" src="/img/v2/TPS.png" />
                 <span>TeenPatti Studio</span>
             </a>
         </li>
         <li class="nav-item Galaxyblinker" style="width:100%;">
-            <a class="dropdown-toggle" role="button" href="/Common/Galaxy">
+            <a class="dropdown-toggle" role="button" href="/Common/Galaxy.html">
                 <img src="/img/v2/Glogo.png" />
                 <span>Galaxy Casino</span>
             </a>
@@ -4633,16 +4633,10 @@ document.addEventListener("DOMContentLoaded", updateUserWallet);
 </script> -->
 <script>
 const socket = io("https://bettingbackending.work.gd");
-
 const matchId = new URLSearchParams(window.location.search).get("id");
 const token = localStorage.getItem("token");
 
-// Base API URL - adjust this to match your backend
-const ordersUrl = "https://bettingbackending.work.gd/api/orders";
-const marketsUrl = "https://bettingbackending.work.gd/api/markets";
-const usersUrl = "https://bettingbackending.work.gd/api/users";
-
-let Pending = []; // Changed from UnMatched to Pending
+let UnMatched = [];
 let Matched = [];
 let runnerPnL = {};
 let allRunners = [];
@@ -4660,7 +4654,7 @@ function format(n) {
 async function updateUserWallet() {
     if (!token) return;
     try {
-        const res = await fetch(`${usersUrl}/latest`, {
+        const res = await fetch(`${ordersUrl}/users/latest`, {
             headers: { "Authorization": "Bearer " + token }
         });
         const data = await res.json();
@@ -4668,10 +4662,8 @@ async function updateUserWallet() {
             const user = data.user;
             const userBtn = document.getElementById("navbar-user");
             if (userBtn) userBtn.innerHTML = `${user.username} (${user.role}) <i class="fas fa-caret-down"></i>`;
-            
             const walletBalance = document.querySelector(".wallet-balance");
             if (walletBalance) walletBalance.textContent = `B: ${Math.floor(user.wallet_balance ?? 0)}`;
-            
             const walletExposure = document.querySelector(".wallet-exposure");
             if (walletExposure) walletExposure.textContent = `| L: -${Math.floor(user.liable ?? 0)}`;
         }
@@ -4710,8 +4702,8 @@ function calculateRunnerPnL(runnerName) {
 
 function updateRunnerPnL() {
     const matchedRunners = [...new Set(Matched.map(o => o.rn || ""))].filter(r => r);
-    const pendingRunners = [...new Set(Pending.map(o => o.rn || ""))].filter(r => r);
-    allRunners = [...new Set([...allRunners, ...matchedRunners, ...pendingRunners])];
+    const unmatchedRunners = [...new Set(UnMatched.map(o => o.rn || ""))].filter(r => r);
+    allRunners = [...new Set([...allRunners, ...matchedRunners, ...unmatchedRunners])];
 
     runnerPnL = {};
     allRunners.forEach(runner => {
@@ -4726,57 +4718,42 @@ function updateRunnerPnL() {
 function render() {
     updateRunnerPnL();
 
-    // Pending table (previously Unmatched)
+    // Unmatched table
     const ub = document.getElementById("unmatched-body");
-    if (ub) {
-        ub.innerHTML = "";
-        Pending.forEach(o => {
-            const tr = document.createElement("tr");
-            tr.className = o.bs === "B" ? "back" : "lay";
-            tr.innerHTML = `
-                <td>${o.rn || o.selectionId || 'N/A'}</td>
-                <td>${o.up || o.price || 0}</td>
-                <td>${format(o.us || o.size || 0)}</td>
-                <td><button class="btn-del" onclick="cancelOrder('${o.requestId || o.orderId}')">X</button></td>
-            `;
-            ub.appendChild(tr);
-        });
-    }
-    
-    const pendingCountEl = document.getElementById("unmatched-count");
-    if (pendingCountEl) pendingCountEl.textContent = Pending.length;
-    
-    const cancelAllBtn = document.getElementById("cancelAllBtn");
-    if (cancelAllBtn) cancelAllBtn.style.display = Pending.length > 0 ? "inline-block" : "none";
+    ub.innerHTML = "";
+    UnMatched.forEach(o => {
+        const tr = document.createElement("tr");
+        tr.className = o.bs === "B" ? "back" : "lay";
+        tr.innerHTML = `
+            <td>${o.rn}</td>
+            <td>${o.up}</td>
+            <td>${format(o.us)}</td>
+            <td><button class="btn-del" onclick="cancelOrder('${o.orderId}')">X</button></td>
+        `;
+        ub.appendChild(tr);
+    });
+    document.getElementById("unmatched-count").textContent = UnMatched.length;
+    document.getElementById("cancelAllBtn").style.display = UnMatched.length > 0 ? "inline-block" : "none";
 
     // Matched table
     const mb = document.getElementById("matched-body");
-    if (mb) {
-        mb.innerHTML = "";
-        allRunners.forEach(runner => {
-            const runnerOrders = Matched.filter(o => {
-                const rn = (o.rn || "").toLowerCase();
-                const runnerLower = runner.toLowerCase();
-                return rn === runnerLower;
+    mb.innerHTML = "";
+    allRunners.forEach(runner => {
+        const runnerOrders = Matched.filter(o => (o.rn || "").toLowerCase() === runner.toLowerCase());
+        if (runnerOrders.length > 0) {
+            runnerOrders.forEach(o => {
+                const tr = document.createElement("tr");
+                tr.className = o.bs === "B" ? "back" : "lay";
+                tr.innerHTML = `
+                    <td>${o.rn}</td>
+                    <td>${o.mp}</td>
+                    <td>${format(o.ms)}</td>
+                `;
+                mb.appendChild(tr);
             });
-            
-            if (runnerOrders.length > 0) {
-                runnerOrders.forEach(o => {
-                    const tr = document.createElement("tr");
-                    tr.className = o.bs === "B" ? "back" : "lay";
-                    tr.innerHTML = `
-                        <td>${o.rn || o.selectionId || 'N/A'}</td>
-                        <td>${o.mp || o.price || 0}</td>
-                        <td>${format(o.ms || o.size || 0)}</td>
-                    `;
-                    mb.appendChild(tr);
-                });
-            }
-        });
-    }
-    
-    const matchedCountEl = document.getElementById("matched-count");
-    if (matchedCountEl) matchedCountEl.textContent = Matched.length;
+        }
+    });
+    document.getElementById("matched-count").textContent = Matched.length;
 
     window.dispatchEvent(new Event("runnerPnLUpdated"));
     updateUserWallet();
@@ -4802,107 +4779,56 @@ window.getRunnerAmounts = function(runnerName) {
 // ---------------------------
 // API HELPERS
 // ---------------------------
-async function fetchPending() {
+async function fetchUnMatched() {
     try {
-        const url = matchId 
-            ? `${ordersUrl}/unmatched?matchId=${matchId}`
-            : `${ordersUrl}/unmatched`;
-        
-        const res = await fetch(url, {
+        const res = await fetch(`${ordersUrl}/orders/unmatched?matchId=${matchId}`, {
             headers: { "Authorization": "Bearer " + token }
         });
-        
-        if (!res.ok) {
-            console.error("Failed to fetch pending orders:", res.status);
-            return;
-        }
-        
         let list = await res.json();
         if (!Array.isArray(list)) list = list.orders || [];
-        
-        Pending = list
-            .filter(o => o.status === "PENDING") // Only include PENDING orders
-            .map(o => ({
-                requestId: o.requestId || o.orderId,
-                orderId: o.requestId || o.orderId, // Keep for backward compatibility
-                rn: o.runnerName || o.selectionName || o.selectionId,
-                selectionId: o.selectionId,
-                up: o.price,
-                us: o.size,
-                bs: (o.side || o.type || "").toUpperCase().charAt(0), // "B" or "L"
-                status: "PENDING",
-                marketId: o.marketId
-            }));
-        
+        UnMatched = list.map(o => ({
+            orderId: o.orderId || o.requestId,
+            rn: o.runnerName || o.selectionId,
+            up: o.price,
+            us: o.size,
+            bs: (o.side || o.type || "").toUpperCase(),
+            status: o.status || "PENDING"  // <-- FIX: ensure status is included
+        }));
         render();
     } catch (e) {
-        console.error("Error fetching pending orders:", e);
+        console.error("Error fetching unmatched:", e);
     }
 }
 
 async function fetchMatched() {
     try {
-        const url = matchId 
-            ? `${ordersUrl}/matched?matchId=${matchId}`
-            : `${ordersUrl}/matched`;
-        
-        const res = await fetch(url, {
+        const res = await fetch(`${ordersUrl}/orders/matched?matchId=${matchId}`, {
             headers: { "Authorization": "Bearer " + token }
         });
-        
-        if (!res.ok) {
-            console.error("Failed to fetch matched orders:", res.status);
-            return;
-        }
-        
         let list = await res.json();
         if (!Array.isArray(list)) list = list.orders || [];
-        
-        Matched = list
-            .filter(o => o.status === "MATCHED") // Only include MATCHED orders
-            .map(o => ({
-                requestId: o.requestId || o.orderId,
-                orderId: o.requestId || o.orderId, // Keep for backward compatibility
-                rn: o.runnerName || o.selectionName || o.selectionId,
-                selectionId: o.selectionId,
-                mp: o.price, // Matched price (executed price)
-                ms: o.size || o.matched || o.matchedSize, // Matched size
-                bs: (o.side || o.type || "").toUpperCase().charAt(0), // "B" or "L"
-                matchId: o.marketId || o.matchId,
-                status: "MATCHED"
-            }));
-        
+        Matched = list.map(o => ({
+            orderId: o.orderId || o.requestId,
+            rn: o.runnerName || o.selectionId,
+            mp: o.price,
+            ms: o.size,
+            bs: (o.side || o.type || "").toUpperCase(),
+            matchId: o.matchId || o.marketId
+        }));
         render();
     } catch (e) {
-        console.error("Error fetching matched orders:", e);
+        console.error("Error fetching matched:", e);
     }
 }
 
 async function fetchRunners() {
     try {
-        const res = await fetch(`${marketsUrl}/${matchId}`, {
+        const res = await fetch(`${ordersUrl}/markets/${matchId}`, {
             headers: { "Authorization": "Bearer " + token }
         });
-        
-        if (!res.ok) {
-            console.error("Failed to fetch market data:", res.status);
-            return;
-        }
-        
         const market = await res.json();
-        const marketData = market.data || market;
-        
-        if (marketData && Array.isArray(marketData.runners)) {
-            const marketRunners = marketData.runners
-                .map(r => r.runnerName || r.name || r.selectionId)
-                .filter(r => r);
-            allRunners = [...new Set([...allRunners, ...marketRunners])];
-            updateRunnerPnL();
-            render();
-        } else if (marketData && marketData.runners && Array.isArray(marketData.runners)) {
-            const marketRunners = marketData.runners
-                .map(r => r.runnerName || r.name || r.selectionId)
-                .filter(r => r);
+        if (market && Array.isArray(market.runners)) {
+            const marketRunners = market.runners.map(r => r.runnerName || r.selectionId).filter(r => r);
             allRunners = [...new Set([...allRunners, ...marketRunners])];
             updateRunnerPnL();
             render();
@@ -4917,56 +4843,23 @@ async function fetchRunners() {
 // ---------------------------
 // CANCEL FUNCTIONS
 // ---------------------------
-async function cancelOrder(requestId) {
+async function cancelOrder(orderId) {
     try {
-        const res = await fetch(`${ordersUrl}/cancel/${requestId}`, {
-            method: "POST",
-            headers: { 
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            }
-        });
-        
-        if (!res.ok) {
-            const error = await res.json();
-            console.error("Error canceling order:", error);
-            alert(error.error || "Failed to cancel order");
-            return;
-        }
-        
-        await fetchPending();
-        await updateUserWallet();
+        await fetch(`${ordersUrl}/orders/cancel/${orderId}`, { method: "POST" });
+        fetchUnMatched();
+        updateUserWallet();
     } catch (e) {
         console.error("Error canceling order:", e);
-        alert("Failed to cancel order. Please try again.");
     }
 }
 
 async function cancelAll() {
     try {
-        const res = await fetch(`${ordersUrl}/cancel-all`, {
-            method: "POST",
-            headers: { 
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            }
-        });
-        
-        if (!res.ok) {
-            const error = await res.json();
-            console.error("Error canceling all orders:", error);
-            alert(error.error || "Failed to cancel all orders");
-            return;
-        }
-        
-        const data = await res.json();
-        console.log("Cancel all result:", data);
-        
-        await fetchPending();
-        await updateUserWallet();
+        await fetch(`${ordersUrl}/orders/cancelAll?matchId=${matchId}`, { method: "POST" });
+        fetchUnMatched();
+        updateUserWallet();
     } catch (e) {
-        console.error("Error canceling all orders:", e);
-        alert("Failed to cancel all orders. Please try again.");
+        console.error("Error canceling all:", e);
     }
 }
 
@@ -4974,116 +4867,79 @@ async function cancelAll() {
 // SOCKET EVENTS
 // ---------------------------
 socket.on("connect", async () => {
-    const isConnectedEl = document.getElementById("isConnected");
-    if (isConnectedEl) isConnectedEl.style.display = "inline";
-    
-    socket.emit("JoinMatch", matchId, async (ack) => {
-        console.log("Joined match room:", matchId, ack);
+    document.getElementById("isConnected").style.display = "inline";
+    socket.emit("JoinMatch", { matchId }, async ack => {
         await fetchRunners();
-        await fetchPending();
+        await fetchUnMatched();
         await fetchMatched();
         await updateUserWallet();
     });
 });
 
 socket.on("disconnect", () => {
-    const isConnectedEl = document.getElementById("isConnected");
-    if (isConnectedEl) isConnectedEl.style.display = "none";
+    document.getElementById("isConnected").style.display = "none";
 });
 
 socket.on("ordersUpdated", data => {
     if (!data || !Array.isArray(data.newOrders)) return;
 
     data.newOrders.forEach(newO => {
-        const requestId = newO.requestId || newO.orderId;
-        const orderId = requestId; // For backward compatibility
-        
-        // Remove from both lists if exists
-        Pending = Pending.filter(o => o.requestId !== requestId && o.orderId !== requestId);
-        Matched = Matched.filter(o => o.requestId !== requestId && o.orderId !== requestId);
+        const order = {
+            orderId: newO.orderId || newO.requestId,
+            rn: newO.runnerName || newO.selectionId,
+            price: newO.price,
+            size: newO.size,
+            bs: (newO.side || newO.type || "").toUpperCase(),
+            status: newO.status
+        };
 
-        // Only handle PENDING and MATCHED statuses (UNMATCHED removed)
-        const status = (newO.status || "PENDING").toUpperCase();
-        
-        if (status === "PENDING") {
-            Pending.push({
-                requestId: requestId,
-                orderId: orderId,
-                rn: newO.runnerName || newO.selectionName || newO.selectionId,
-                selectionId: newO.selectionId,
-                up: newO.price,
-                us: newO.size,
-                bs: (newO.side || newO.type || "").toUpperCase().charAt(0),
-                status: "PENDING",
-                marketId: newO.marketId || newO.matchId
+        // Remove from both lists if exists
+        UnMatched = UnMatched.filter(o => o.orderId !== order.orderId);
+        Matched = Matched.filter(o => o.orderId !== order.orderId);
+
+        // Treat UNMATCHED as PENDING
+        const frontendStatus = (newO.status === "MATCHED") ? "MATCHED" : "PENDING";
+
+        if (frontendStatus === "PENDING") {
+            UnMatched.push({
+                orderId: order.orderId,
+                rn: order.rn,
+                up: order.price,
+                us: order.size,
+                bs: order.bs,
+                status: "PENDING"
             });
-        } else if (status === "MATCHED") {
+        } else if (frontendStatus === "MATCHED") {
             Matched.push({
-                requestId: requestId,
-                orderId: orderId,
-                rn: newO.runnerName || newO.selectionName || newO.selectionId,
-                selectionId: newO.selectionId,
-                mp: newO.price, // Executed price
-                ms: newO.size || newO.matched || newO.matchedSize,
-                bs: (newO.side || newO.type || "").toUpperCase().charAt(0),
-                matchId: newO.marketId || newO.matchId,
-                status: "MATCHED"
+                orderId: order.orderId,
+                rn: order.rn,
+                mp: order.price,
+                ms: order.size,
+                bs: order.bs,
+                matchId: newO.matchId || newO.marketId
             });
         }
     });
-    
     render();
 });
 
-socket.on("userUpdated", data => {
-    // Update wallet when user data changes
-    if (data.wallet_balance !== undefined || data.liable !== undefined) {
-        updateUserWallet();
-    }
-});
-
-socket.on("marketOddsUpdated", data => {
-    // Market odds updated - this may trigger auto-matching
-    // The backend will handle auto-matching, we just need to refresh
-    if (data.marketId === matchId) {
-        // Refresh pending orders to see if any got matched
-        setTimeout(() => {
-            fetchPending();
-            fetchMatched();
-        }, 1000); // Small delay to allow backend processing
-    }
-});
 
 // ---------------------------
 // AUTO REFRESH
 // ---------------------------
 setInterval(() => {
     if (matchId) {
-        fetchPending();
+        fetchUnMatched();
         fetchMatched();
     }
 }, 5000);
 
-// ---------------------------
-// INITIALIZATION
-// ---------------------------
 document.addEventListener("DOMContentLoaded", async () => {
     updateUserWallet();
-    if (matchId) {
-        await fetchRunners();
-        await fetchPending();
-        await fetchMatched();
-    }
+    await fetchRunners();
 });
-
-// Export functions for global access
-window.cancelOrder = cancelOrder;
-window.cancelAll = cancelAll;
-window.fetchPending = fetchPending;
-window.fetchMatched = fetchMatched;
-window.updateUserWallet = updateUserWallet;
-
 </script>
+
 
 
             </center>
