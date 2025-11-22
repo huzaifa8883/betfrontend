@@ -4843,25 +4843,61 @@ async function fetchRunners() {
 // ---------------------------
 // CANCEL FUNCTIONS
 // ---------------------------
+// FRONTEND: ensure ordersUrl variable is set (e.g. const ordersUrl = "https://.../orders")
 async function cancelOrder(orderId) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        console.warn("No auth token, cannot cancel");
+        return;
+    }
+
     try {
-        await fetch(`${ordersUrl}/orders/cancel/${orderId}`, { method: "POST" });
-        fetchUnMatched();
-        updateUserWallet();
+        // Use the server route /orders/cancel/:requestId
+        const res = await fetch(`${ordersUrl}/cancel/${encodeURIComponent(orderId)}`, {
+            method: "POST",
+            headers: { "Authorization": "Bearer " + token }
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            console.error("Cancel order failed:", data);
+        } else {
+            // refresh lists and wallet
+            await fetchUnMatched();
+            await fetchMatched();
+            await updateUserWallet();
+        }
     } catch (e) {
         console.error("Error canceling order:", e);
     }
 }
 
 async function cancelAll() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        console.warn("No auth token, cannot cancel");
+        return;
+    }
+
     try {
-        await fetch(`${ordersUrl}/orders/cancelAll?matchId=${matchId}`, { method: "POST" });
-        fetchUnMatched();
-        updateUserWallet();
+        // Use the server route /orders/cancel-all
+        const res = await fetch(`${ordersUrl}/cancel-all`, {
+            method: "POST",
+            headers: { "Authorization": "Bearer " + token }
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            console.error("Cancel all failed:", data);
+        } else {
+            // refresh UI + wallet
+            await fetchUnMatched();
+            await fetchMatched();
+            await updateUserWallet();
+        }
     } catch (e) {
         console.error("Error canceling all:", e);
     }
 }
+
 
 // ---------------------------
 // SOCKET EVENTS
