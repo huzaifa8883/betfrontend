@@ -4853,7 +4853,7 @@ async function cancelOrder(orderId) {
 
     try {
         // Use the server route /orders/cancel/:requestId
-        const res = await fetch(`${ordersUrl}/cancel/${encodeURIComponent(orderId)}`, {
+        const res = await fetch(`${ordersUrl}/orders/cancel/${encodeURIComponent(orderId)}`, {
             method: "POST",
             headers: { "Authorization": "Bearer " + token }
         });
@@ -4880,7 +4880,7 @@ async function cancelAll() {
 
     try {
         // Use the server route /orders/cancel-all
-        const res = await fetch(`${ordersUrl}/cancel-all`, {
+        const res = await fetch(`${ordersUrl}/orders/cancel-all`, {
             method: "POST",
             headers: { "Authorization": "Bearer " + token }
         });
