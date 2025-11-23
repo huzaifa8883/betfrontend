@@ -796,119 +796,131 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 </script>
 <script>
-const baseUrl = "https://bettingbackending.work.gd/api";
-const ordersurl = baseUrl + "/orders";
-const usersUrl = baseUrl + "/users";
-const transactionsUrl = baseUrl + "/orders/transactions"; // deposit transactions route
+    const baseUrl = "https://bettingbackending.work.gd/api";
+    const ordersurl = baseUrl + "/orders";
+    const usersUrl = baseUrl + "/users";
+    const transactionsUrl = baseUrl + "/orders/transactions";
 
-new Vue({
-  el: "#ledgerApp",
-  data: {
-    ledger: [],
-    openingBalance: 0
-  },
-  methods: {
-    async fetchLedger() {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
+    new Vue({
+        el: "#ledgerApp",
+        data: {
+            ledger: [],
+            openingBalance: 0
+        },
+        methods: {
+            async fetchLedger() {
+                try {
+                    const token = localStorage.getItem("token");
+                    if (!token) return;
 
-        // Step 1: Get current user
-        const userRes = await fetch(usersUrl + "/me", {
-          headers: { "Authorization": "Bearer " + token }
-        });
-        const userData = await userRes.json();
-        const userId = userData?.user?._id;
-        const username = userData?.user?.username;
+                    // Step 1: Get current user
+                    const userRes = await fetch(usersUrl + "/me", {
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    });
+                    const userData = await userRes.json();
+                    const userId = userData?.user?._id;
+                    const username = userData?.user?.username;
 
-        // Step 2: Get deposit transactions
-        const transRes = await fetch(transactionsUrl, {
-          headers: { "Authorization": "Bearer " + token }
-        });
-        const allTrans = await transRes.json();
+                    // Step 2: Get deposit transactions
+                    const transRes = await fetch(transactionsUrl, {
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    });
+                    const allTrans = await transRes.json();
+                    const deposits = allTrans.filter(
+                        t => t.type === "deposit" && t.to_user_id === userId && t.status === "completed"
+                    );
 
-        const deposits = allTrans.filter(
-          t => t.type === "deposit" && t.to_user_id === userId && t.status === "completed"
-        );
+                    // Step 3: Build ledger starting with 0 Opening Balance
+                    let runningBalance = 0;
+                    const ledgerRows = [{
+                        date: new Date().toLocaleString(),
+                        description: "Opening Balance",
+                        amount: 0,
+                        balance: runningBalance
+                    }];
 
-        // Step 3: Build ledger starting with 0 Opening Balance
-        let runningBalance = 0;
-        const ledgerRows = [
-          {
-            date: new Date().toLocaleString(),
-            description: "Opening Balance",
-            amount: 0,
-            balance: runningBalance
-          }
-        ];
+                    // Add deposits after Opening Balance
+                    for (const dep of deposits) {
+                        runningBalance += Number(dep.amount || 0);
+                        ledgerRows.push({
+                            date: new Date(dep.performed_at).toLocaleString(),
+                            description: `Cash deposit in ${username}`,
+                            amount: Number(dep.amount),
+                            balance: runningBalance
+                        });
+                    }
 
-        // Add deposits after Opening Balance
-        for (const dep of deposits) {
-          runningBalance += Number(dep.amount || 0);
-          ledgerRows.push({
-            date: new Date(dep.performed_at).toLocaleString(),
-            description: `Cash deposit in ${username}`,
-            amount: Number(dep.amount),
-            balance: runningBalance
-          });
+                    // Set openingBalance = total deposits
+                    this.openingBalance = runningBalance;
+
+                    // Step 4: Fetch all bets
+                    const res = await fetch(ordersurl + "/all", {
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    });
+                    const allOrders = await res.json();
+
+                    const settledBets = allOrders
+                        .filter(o => o.status === "SETTLED")
+                        .sort((a, b) => new Date(a.settled_at || a.updated_at) - new Date(b.settled_at || b.updated_at));
+
+                    // Step 5: Add settled bets (FIXED LOGIC HERE)
+                    for (const bet of settledBets) {
+                        const price = Number(bet.price);
+                        const size = Number(bet.size);
+                        let profitOrLoss = 0;
+
+                        // FIX: IDs ko String mein convert karke compare kiya
+                        const isWinner = bet.winningSelectionId && String(bet.selectionId) === String(bet.winningSelectionId);
+
+                        if (isWinner) {
+                            // -- WIN CASE --
+                            // Agar Back (B) kiya tha aur jeet gaye: Profit = (Odds - 1) * Stake
+                            // Agar Lay (L) kiya tha aur jeet gaye (matlab backer haara): Profit = Stake
+                            profitOrLoss = bet.side === "B" ? (price - 1) * size : size;
+                        } else {
+                            // -- LOSS CASE --
+                            // Agar Back (B) kiya tha aur haar gaye: Loss = -Stake
+                            // Agar Lay (L) kiya tha aur haar gaye (matlab backer jeeta): Loss = -(Odds - 1) * Stake
+                            profitOrLoss = bet.side === "B" ? -size : -((price - 1) * size);
+                        }
+
+                        runningBalance += profitOrLoss;
+
+                        ledgerRows.push({
+                            date: new Date(bet.settled_at || bet.updated_at || bet.created_at).toLocaleString(),
+                            description: `${bet.event || "Match Result"} (${isWinner ? 'WIN' : 'LOSS'})`,
+                            amount: parseFloat(profitOrLoss.toFixed(2)), // Decimal fix
+                            balance: parseFloat(runningBalance.toFixed(2))
+                        });
+                    }
+
+                    // Step 6: Adjust running balance for pending (liable) bets
+                    // Ye sirf current available balance dikhane ke liye hai
+                    if (userData?.user?.liable) {
+                        runningBalance -= Number(userData.user.liable);
+                    }
+
+                    this.ledger = ledgerRows;
+
+                    console.log("🪙 Opening Balance (0):", 0);
+                    console.log("💰 Running Balance after settled + liable:", runningBalance);
+
+                } catch (err) {
+                    console.error("Error fetching ledger:", err);
+                }
+            }
+        },
+        mounted() {
+            this.fetchLedger();
         }
-
-        // Set openingBalance = total deposits
-        this.openingBalance = runningBalance;
-
-        // Step 4: Fetch all bets
-        const res = await fetch(ordersurl + "/all", {
-          headers: { "Authorization": "Bearer " + token }
-        });
-        const allOrders = await res.json();
-
-        const settledBets = allOrders
-          .filter(o => o.status === "SETTLED")
-          .sort((a, b) => new Date(a.settled_at || a.updated_at) - new Date(b.settled_at || b.updated_at));
-
-        // Step 5: Add settled bets with proper liable handling
-        for (const bet of settledBets) {
-          const price = Number(bet.price);
-          const size = Number(bet.size);
-          let profitOrLoss = 0;
-
-          if (bet.selectionId === bet.winningSelectionId) {
-            profitOrLoss = bet.side === "B" ? (price - 1) * size : -(price - 1) * size;
-          } else {
-            profitOrLoss = bet.side === "B" ? -size : size;
-          }
-
-          // Deduct liable only for loss bets
-          if (profitOrLoss < 0 && userData?.user?.liable) {
-            profitOrLoss -= Number(userData.user.liable);
-          }
-
-          runningBalance += profitOrLoss;
-
-          ledgerRows.push({
-            date: new Date(bet.settled_at || bet.updated_at || bet.created_at).toLocaleString(),
-            description: bet.event || "Match Result",
-            amount: profitOrLoss,
-            balance: runningBalance
-          });
-        }
-
-        this.ledger = ledgerRows;
-
-        console.log("🪙 Opening Balance (0):", 0);
-        console.log("💰 Running Balance after settled + liable:", runningBalance);
-
-      } catch (err) {
-        console.error("Error fetching ledger:", err);
-      }
-    }
-  },
-  mounted() {
-    this.fetchLedger();
-  }
-});
+    });
 </script>
-
 
 
 <script>
