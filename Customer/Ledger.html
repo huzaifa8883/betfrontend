@@ -866,7 +866,7 @@ new Vue({
           .filter(o => o.status === "SETTLED")
           .sort((a, b) => new Date(a.settled_at || a.updated_at) - new Date(b.settled_at || b.updated_at));
 
-        // Step 5: Add settled bets
+        // Step 5: Add settled bets with proper liable handling
         for (const bet of settledBets) {
           const price = Number(bet.price);
           const size = Number(bet.size);
@@ -878,6 +878,11 @@ new Vue({
             profitOrLoss = bet.side === "B" ? -size : size;
           }
 
+          // Deduct liable only for loss bets
+          if (profitOrLoss < 0 && userData?.user?.liable) {
+            profitOrLoss -= Number(userData.user.liable);
+          }
+
           runningBalance += profitOrLoss;
 
           ledgerRows.push({
@@ -886,11 +891,6 @@ new Vue({
             amount: profitOrLoss,
             balance: runningBalance
           });
-        }
-
-        // Step 6: Adjust running balance for pending (liable) bets only
-        if (userData?.user?.liable) {
-          runningBalance -= Number(userData.user.liable);
         }
 
         this.ledger = ledgerRows;
@@ -908,7 +908,6 @@ new Vue({
   }
 });
 </script>
-
 
 
 
