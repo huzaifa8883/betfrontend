@@ -38,9 +38,34 @@ app.get("/Common/markets", (req, res) => {
 app.get("/Common/profile", (req, res) => {
   res.sendFile(path.join(__dirname, "Common", "profile.html"));
 });
+app.get("/Common/RSC", (req, res) => {
+  res.sendFile(path.join(__dirname, "Common", "RSC.html"));
+});
+app.get("/Common/Sapp", (req, res) => {
+  res.sendFile(path.join(__dirname, "Common", "Sapp.html"));
+});
+app.get("/Common/Games", (req, res) => {
+  res.sendFile(path.join(__dirname, "Common", "Games.html"));
+});
+app.get("/Common/WorldCasino", (req, res) => {
+  res.sendFile(path.join(__dirname, "Common", "WorldCasino.html"));
+});
+app.get("/Common/DreamGame", (req, res) => {
+  res.sendFile(path.join(__dirname, "Common", "Dream.html"));
+});
+app.get("/Common/ExGames", (req, res) => {
+  res.sendFile(path.join(__dirname, "Common", "ExGames.html"));
+});
+app.get("Common/Galaxy", (req, res) => {
+  res.sendFile(path.join(__dirname, "Common", "Galaxy.html"));
+});
+app.get("/Common/BetProGames", (req, res) => {
+  res.sendFile(path.join(__dirname, "Common", "BetProGames.html"));
+});
 app.get("/Accounts/Chart", (req, res) => {
   res.sendFile(path.join(__dirname, "Accounts", "Chart.html"));
 });
+
 
 app.get("/Reports/BookDetail", (req, res) => {
   res.sendFile(path.join(__dirname, "Reports", "BookDetail.html"));
