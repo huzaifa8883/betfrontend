@@ -936,22 +936,16 @@ async function loadhorseMatches() {
     if (result.status === 'success' && result.data.length > 0) {
       result.data.forEach(match => {
         const li = document.createElement('li');
-        li.classList.add('match-card'); // ✅ Custom style class
+        li.classList.add('match-card');
 
         const startTimeUTC = new Date(match.startTime);
 
-        // Convert UTC → Pakistan Time (UTC +5)
-        const pktTime = new Date(startTimeUTC.getTime() + 5 * 60 * 60 * 1000);
-
-        const timeStr = pktTime.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }).toLowerCase(); // e.g., "4:50 pm"
+        // ✅ Show UTC time exactly as backend provides
+        const timeStr = startTimeUTC.toISOString().split('T')[1].substring(0,5) + ' UTC';
+        // Example: "03:00 UTC"
 
         li.textContent = `${timeStr} ${match.match}`;
 
-        // Click handler: redirect to market.html with marketId
         li.style.cursor = 'pointer';
         li.addEventListener('click', () => {
           window.location.href = `/Common/Market.html?id=${encodeURIComponent(match.marketId)}`;
@@ -970,6 +964,7 @@ async function loadhorseMatches() {
 // Auto load on page load
 loadhorseMatches();
 </script>
+
 
 
 <script>
@@ -991,14 +986,9 @@ async function loadHorseLiveData() {
       data.data.forEach(match => {
         const startTimeUTC = new Date(match.startTime);
 
-        // Convert UTC → Pakistan Time (UTC +5)
-        const pktTime = new Date(startTimeUTC.getTime() + 5 * 60 * 60 * 1000);
-
-        const localTime = pktTime.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }).toLowerCase(); // e.g., "4:50 pm"
+        // ✅ Show UTC time directly
+        const utcTimeStr = startTimeUTC.toISOString().split('T')[1].substring(0,5) + ' UTC';
+        // Example: "03:00 UTC"
 
         const div = document.createElement('div');
         div.className = 'chk11';
@@ -1008,7 +998,7 @@ async function loadHorseLiveData() {
         div.innerHTML = `
           <a href="/Common/Market.html?id=${match.marketId}" style="color:white; width:auto;">
             <b class="chkmobile">
-              <span class="slidedate market-time">${localTime}</span>
+              <span class="slidedate market-time">${utcTimeStr}</span>
               <br>
               <span class='slidename'>${match.match}</span>
             </b>
