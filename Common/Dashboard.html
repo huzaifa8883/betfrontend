@@ -940,9 +940,13 @@ async function loadhorseMatches() {
 
         const startTimeUTC = new Date(match.startTime);
 
-        // ✅ Show UTC time exactly as backend provides
-        const timeStr = startTimeUTC.toISOString().split('T')[1].substring(0,5) + ' UTC';
-        // Example: "03:00 UTC"
+        // ✅ Convert to 12-hour UTC format with AM/PM
+        const timeStr = startTimeUTC.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+          timeZone: 'UTC' // Ensures we stay in UTC
+        }).toLowerCase(); // e.g., "3:00 am"
 
         li.textContent = `${timeStr} ${match.match}`;
 
