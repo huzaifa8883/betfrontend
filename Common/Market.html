@@ -887,6 +887,7 @@
   async function initRelatedEvents() {
     const urlParams = new URLSearchParams(window.location.search);
     const marketId = urlParams.get('id');
+    console.log(marketId)
 
     if (!marketId) {
       console.warn('No market ID found in URL');
@@ -5253,7 +5254,8 @@ export default {
             let ifrEl = document.querySelector("#livesc");
             if (ifrEl != null) {
                 setTimeout(function () { 
-                    ifrEl.src = `https://bpexch.xyz/Common/LiveScoreCard?id=${marketId}`; 
+                    ifrEl.src = `https://bpexch.xyz/Common/LiveScoreCard?id=${marketId}`;
+                    console.log(ifrEL)
                 }, 2000);
             }
             setTimeout(function() { PremiumSportsIframeset()}, 2000);
