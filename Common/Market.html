@@ -4636,6 +4636,7 @@ const socket = io("https://bettingbackending.work.gd");
 const matchId = new URLSearchParams(window.location.search).get("id");
 const token = localStorage.getItem("token");
 
+// Data Stores
 let UnMatched = [];
 let Matched = [];
 let runnerPnL = {};
@@ -4645,7 +4646,7 @@ let allRunners = [];
 // Utilities
 // ---------------------------
 function format(n) {
-    return Number(n || 0).toLocaleString();
+    return Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // ---------------------------
@@ -4659,53 +4660,90 @@ async function updateUserWallet() {
         });
         const data = await res.json();
         if (data.success && data.user) {
-            const user = data.user;
-            const userBtn = document.getElementById("navbar-user");
-            if (userBtn) userBtn.innerHTML = `${user.username} (${user.role}) <i class="fas fa-caret-down"></i>`;
-            const walletBalance = document.querySelector(".wallet-balance");
-            if (walletBalance) walletBalance.textContent = `B: ${Math.floor(user.wallet_balance ?? 0)}`;
-            const walletExposure = document.querySelector(".wallet-exposure");
-            if (walletExposure) walletExposure.textContent = `| L: -${Math.floor(user.liable ?? 0)}`;
+            updateWalletUI(data.user);
         }
     } catch (err) {
         console.error("Error loading latest user info:", err);
     }
 }
 
+// Helper to update Wallet UI from any source (Fetch or Socket)
+function updateWalletUI(user) {
+    const userBtn = document.getElementById("navbar-user");
+    if (userBtn && user.username) {
+        userBtn.innerHTML = `${user.username} (${user.role}) <i class="fas fa-caret-down"></i>`;
+    }
+    const walletBalance = document.querySelector(".wallet-balance");
+    if (walletBalance) walletBalance.textContent = `B: ${format(user.wallet_balance ?? 0)}`;
+    
+    const walletExposure = document.querySelector(".wallet-exposure");
+    if (walletExposure) walletExposure.textContent = `| L: -${format(user.liable ?? 0)}`;
+}
+
 // ---------------------------
-// PNL CALCULATIONS
+// PNL CALCULATIONS (UPDATED)
 // ---------------------------
 function calculateRunnerPnL(runnerName) {
     const normalized = runnerName.trim().toLowerCase();
     let profit = 0;
     let liability = 0;
 
-    Matched.forEach(order => {
-        const rn = (order.rn || "").trim().toLowerCase();
-        const odds = Number(order.mp || 0);
-        const stake = Number(order.ms || 0);
-        const side = (order.bs || "").toUpperCase();
+    // 1. Normalize Matched Bets
+    const matchedBets = Matched.map(m => ({
+        rn: (m.rn || "").trim().toLowerCase(),
+        odds: parseFloat(m.mp || 0),
+        stake: parseFloat(m.ms || 0),
+        side: (m.bs || "").toUpperCase()
+    }));
 
-        if (!rn || odds === 0 || stake === 0) return;
+    // 2. Normalize Pending (Unmatched) Bets
+    const pendingBets = UnMatched.map(u => ({
+        rn: (u.rn || "").trim().toLowerCase(),
+        odds: parseFloat(u.up || 0),
+        stake: parseFloat(u.us || 0),
+        side: (u.bs || "").toUpperCase()
+    }));
 
-        if (rn === normalized) {
-            if (side === "B") profit += (odds - 1) * stake;
-            else if (side === "L") liability += (odds - 1) * stake;
+    // 3. Merge Both Arrays for Calculation
+    const allBets = [...matchedBets, ...pendingBets];
+
+    allBets.forEach(order => {
+        if (!order.rn || order.odds === 0 || order.stake === 0) return;
+
+        if (order.rn === normalized) {
+            // Case: The Runner Wins
+            if (order.side === "B") {
+                // Back Win: (Odds - 1) * Stake
+                profit += (order.odds - 1) * order.stake;
+            } else if (order.side === "L") {
+                // Lay Win (for us, meaning runner wins, so we lose): Liability
+                liability += (order.odds - 1) * order.stake; // This adds to our "Loss" column
+            }
         } else {
-            if (side === "B") liability += stake;
-            else if (side === "L") profit += stake;
+            // Case: The Runner Loses (Some other runner wins)
+            if (order.side === "B") {
+                // Back Loss: We lose the stake
+                liability += order.stake;
+            } else if (order.side === "L") {
+                // Lay Loss (for us, meaning runner loses, so we win): +Stake
+                profit += order.stake;
+            }
         }
     });
 
+    // Return Net PnL (Profit - Liability)
     return { profit, liability, net: profit - liability };
 }
 
 function updateRunnerPnL() {
+    // Gather all unique runner names from API + Orders
     const matchedRunners = [...new Set(Matched.map(o => o.rn || ""))].filter(r => r);
     const unmatchedRunners = [...new Set(UnMatched.map(o => o.rn || ""))].filter(r => r);
     allRunners = [...new Set([...allRunners, ...matchedRunners, ...unmatchedRunners])];
 
     runnerPnL = {};
+    
+    // Calculate PnL for every runner in the market
     allRunners.forEach(runner => {
         const { profit, liability, net } = calculateRunnerPnL(runner);
         runnerPnL[runner] = { profit, liability, net };
@@ -4713,67 +4751,78 @@ function updateRunnerPnL() {
 }
 
 // ---------------------------
-// RENDER TABLES
+// RENDER TABLES & UI
 // ---------------------------
 function render() {
     updateRunnerPnL();
 
     // Unmatched table
     const ub = document.getElementById("unmatched-body");
-    ub.innerHTML = "";
-    UnMatched.forEach(o => {
-        const tr = document.createElement("tr");
-        tr.className = o.bs === "B" ? "back" : "lay";
-        tr.innerHTML = `
-            <td>${o.rn}</td>
-            <td>${o.up}</td>
-            <td>${format(o.us)}</td>
-            <td><button class="btn-del" onclick="cancelOrder('${o.orderId}')">X</button></td>
-        `;
-        ub.appendChild(tr);
-    });
-    document.getElementById("unmatched-count").textContent = UnMatched.length;
-    document.getElementById("cancelAllBtn").style.display = UnMatched.length > 0 ? "inline-block" : "none";
+    if(ub) {
+        ub.innerHTML = "";
+        UnMatched.forEach(o => {
+            const tr = document.createElement("tr");
+            tr.className = o.bs === "B" ? "back" : "lay";
+            tr.innerHTML = `
+                <td>${o.rn}</td>
+                <td>${o.up}</td>
+                <td>${format(o.us)}</td>
+                <td><button class="btn-del" onclick="cancelOrder('${o.orderId}')">X</button></td>
+            `;
+            ub.appendChild(tr);
+        });
+        const uCount = document.getElementById("unmatched-count");
+        if(uCount) uCount.textContent = UnMatched.length;
+        
+        const cBtn = document.getElementById("cancelAllBtn");
+        if(cBtn) cBtn.style.display = UnMatched.length > 0 ? "inline-block" : "none";
+    }
 
     // Matched table
     const mb = document.getElementById("matched-body");
-    mb.innerHTML = "";
-    allRunners.forEach(runner => {
-        const runnerOrders = Matched.filter(o => (o.rn || "").toLowerCase() === runner.toLowerCase());
-        if (runnerOrders.length > 0) {
-            runnerOrders.forEach(o => {
-                const tr = document.createElement("tr");
-                tr.className = o.bs === "B" ? "back" : "lay";
-                tr.innerHTML = `
-                    <td>${o.rn}</td>
-                    <td>${o.mp}</td>
-                    <td>${format(o.ms)}</td>
-                `;
-                mb.appendChild(tr);
-            });
-        }
-    });
-    document.getElementById("matched-count").textContent = Matched.length;
+    if(mb) {
+        mb.innerHTML = "";
+        allRunners.forEach(runner => {
+            const runnerOrders = Matched.filter(o => (o.rn || "").toLowerCase() === runner.toLowerCase());
+            if (runnerOrders.length > 0) {
+                runnerOrders.forEach(o => {
+                    const tr = document.createElement("tr");
+                    tr.className = o.bs === "B" ? "back" : "lay";
+                    tr.innerHTML = `
+                        <td>${o.rn}</td>
+                        <td>${o.mp}</td>
+                        <td>${format(o.ms)}</td>
+                    `;
+                    mb.appendChild(tr);
+                });
+            }
+        });
+        const mCount = document.getElementById("matched-count");
+        if(mCount) mCount.textContent = Matched.length;
+    }
 
+    // Trigger external UI updates (e.g. for Vue/React components listening)
     window.dispatchEvent(new Event("runnerPnLUpdated"));
-    updateUserWallet();
 }
 
-// Vue/template helper
+// Global Helper for UI Binding
 window.getRunnerAmounts = function(runnerName) {
     const normalized = runnerName.trim().toLowerCase();
+    
+    // Ensure runner is tracked
     if (!allRunners.some(r => r.trim().toLowerCase() === normalized)) {
         allRunners.push(runnerName);
         updateRunnerPnL();
     }
 
     const key = Object.keys(runnerPnL).find(k => k.trim().toLowerCase() === normalized);
-    const { profit, liability, net } = runnerPnL[key] || { profit: 0, liability: 0, net: 0 };
-    const otherLiability = Object.keys(runnerPnL)
-        .filter(k => k.trim().toLowerCase() !== normalized)
-        .reduce((sum, k) => sum + (runnerPnL[k]?.liability || 0), 0);
-
-    return { ifWin: net, ifLose: otherLiability, net };
+    const { net } = runnerPnL[key] || { net: 0 };
+    
+    return { 
+        net,
+        color: net >= 0 ? 'text-green-600' : 'text-red-600',
+        formatted: format(net)
+    };
 };
 
 // ---------------------------
@@ -4786,13 +4835,14 @@ async function fetchUnMatched() {
         });
         let list = await res.json();
         if (!Array.isArray(list)) list = list.orders || [];
+        
         UnMatched = list.map(o => ({
             orderId: o.orderId || o.requestId,
             rn: o.runnerName || o.selectionId,
             up: o.price,
             us: o.size,
             bs: (o.side || o.type || "").toUpperCase(),
-            status: o.status || "PENDING"  // <-- FIX: ensure status is included
+            status: o.status || "PENDING"
         }));
         render();
     } catch (e) {
@@ -4807,6 +4857,7 @@ async function fetchMatched() {
         });
         let list = await res.json();
         if (!Array.isArray(list)) list = list.orders || [];
+        
         Matched = list.map(o => ({
             orderId: o.orderId || o.requestId,
             rn: o.runnerName || o.selectionId,
@@ -4832,8 +4883,6 @@ async function fetchRunners() {
             allRunners = [...new Set([...allRunners, ...marketRunners])];
             updateRunnerPnL();
             render();
-        } else {
-            console.warn("No runners found in market data");
         }
     } catch (e) {
         console.error("Error fetching runners:", e);
@@ -4841,70 +4890,42 @@ async function fetchRunners() {
 }
 
 // ---------------------------
-// CANCEL FUNCTIONS
+// ACTION FUNCTIONS
 // ---------------------------
-// FRONTEND: ensure ordersUrl variable is set (e.g. const ordersUrl = "https://.../orders")
 async function cancelOrder(orderId) {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        console.warn("No auth token, cannot cancel");
-        return;
-    }
-
+    if (!token) return;
     try {
-        // Use the server route /orders/cancel/:requestId
         const res = await fetch(`${ordersUrl}/orders/cancel/${encodeURIComponent(orderId)}`, {
             method: "POST",
             headers: { "Authorization": "Bearer " + token }
         });
-        const data = await res.json();
-        if (!res.ok) {
-            console.error("Cancel order failed:", data);
-        } else {
-            // refresh lists and wallet
-            await fetchUnMatched();
-            await fetchMatched();
-            await updateUserWallet();
-        }
+        // Note: We don't need to manually fetch here because the socket 
+        // will emit "orderCancelled" which we handle below.
     } catch (e) {
         console.error("Error canceling order:", e);
     }
 }
 
 async function cancelAll() {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        console.warn("No auth token, cannot cancel");
-        return;
-    }
-
+    if (!token) return;
     try {
-        // Use the server route /orders/cancel-all
-        const res = await fetch(`${ordersUrl}/orders/cancel-all`, {
+        await fetch(`${ordersUrl}/orders/cancel-all`, {
             method: "POST",
             headers: { "Authorization": "Bearer " + token }
         });
-        const data = await res.json();
-        if (!res.ok) {
-            console.error("Cancel all failed:", data);
-        } else {
-            // refresh UI + wallet
-            await fetchUnMatched();
-            await fetchMatched();
-            await updateUserWallet();
-        }
     } catch (e) {
         console.error("Error canceling all:", e);
     }
 }
 
-
 // ---------------------------
-// SOCKET EVENTS
+// SOCKET EVENTS - REAL TIME LOGIC
 // ---------------------------
-socket.on("connect", async () => {
-    document.getElementById("isConnected").style.display = "inline";
-    socket.emit("JoinMatch", { matchId }, async ack => {
+socket.on("connect", () => {
+    const icon = document.getElementById("isConnected");
+    if(icon) icon.style.display = "inline";
+    
+    socket.emit("JoinMatch", { matchId }, async () => {
         await fetchRunners();
         await fetchUnMatched();
         await fetchMatched();
@@ -4913,15 +4934,18 @@ socket.on("connect", async () => {
 });
 
 socket.on("disconnect", () => {
-    document.getElementById("isConnected").style.display = "none";
+    const icon = document.getElementById("isConnected");
+    if(icon) icon.style.display = "none";
 });
 
+// 1. Handle New/Updated Bets
 socket.on("ordersUpdated", data => {
     if (!data || !Array.isArray(data.newOrders)) return;
 
     data.newOrders.forEach(newO => {
+        // Standardize structure
         const order = {
-            orderId: newO.orderId || newO.requestId,
+            orderId: String(newO.orderId || newO.requestId),
             rn: newO.runnerName || newO.selectionId,
             price: newO.price,
             size: newO.size,
@@ -4929,14 +4953,20 @@ socket.on("ordersUpdated", data => {
             status: newO.status
         };
 
-        // Remove from both lists if exists
-        UnMatched = UnMatched.filter(o => o.orderId !== order.orderId);
-        Matched = Matched.filter(o => o.orderId !== order.orderId);
+        // Remove from existing lists to prevent duplicates
+        UnMatched = UnMatched.filter(o => String(o.orderId) !== order.orderId);
+        Matched = Matched.filter(o => String(o.orderId) !== order.orderId);
 
-        // Treat UNMATCHED as PENDING
-        const frontendStatus = (newO.status === "MATCHED") ? "MATCHED" : "PENDING";
-
-        if (frontendStatus === "PENDING") {
+        if (order.status === "MATCHED") {
+            Matched.push({
+                orderId: order.orderId,
+                rn: order.rn,
+                mp: order.price,
+                ms: order.size,
+                bs: order.bs,
+                matchId: newO.matchId
+            });
+        } else if (order.status === "PENDING") {
             UnMatched.push({
                 orderId: order.orderId,
                 rn: order.rn,
@@ -4945,23 +4975,57 @@ socket.on("ordersUpdated", data => {
                 bs: order.bs,
                 status: "PENDING"
             });
-        } else if (frontendStatus === "MATCHED") {
-            Matched.push({
-                orderId: order.orderId,
-                rn: order.rn,
-                mp: order.price,
-                ms: order.size,
-                bs: order.bs,
-                matchId: newO.matchId || newO.marketId
-            });
         }
     });
+    // This triggers the Recalculation of PnL including the new Pending bets
     render();
+});
+
+// 2. Handle Single Bet Cancellation
+socket.on("orderCancelled", (data) => {
+    // data = { requestId, wallet, liability }
+    if (!data || !data.requestId) return;
+    
+    // Remove from Unmatched list
+    UnMatched = UnMatched.filter(o => String(o.orderId) !== String(data.requestId));
+    
+    // Update Wallet UI instantly if data provided
+    if(data.wallet !== undefined) {
+        updateWalletUI({ wallet_balance: data.wallet, liable: data.liability });
+    } else {
+        updateUserWallet(); // Fallback fetch
+    }
+
+    // Re-render (Recalculates PnL removing the cancelled bet)
+    render();
+});
+
+// 3. Handle Cancel All
+socket.on("ordersCancelledAll", (data) => {
+    // Clear all pending bets locally
+    UnMatched = [];
+    
+    if(data.wallet !== undefined) {
+        updateWalletUI({ wallet_balance: data.wallet });
+    } else {
+        updateUserWallet();
+    }
+    
+    render();
+});
+
+// 4. Handle General User Updates (Wallet changes)
+socket.on("userUpdated", (data) => {
+    // data = { wallet_balance, liable, runnerPnL }
+    updateWalletUI(data);
+    
+    // If backend sends pre-calc PnL, we could use it, 
+    // but we are calculating locally to include Pending bets instantly.
 });
 
 
 // ---------------------------
-// AUTO REFRESH
+// INITIALIZATION
 // ---------------------------
 setInterval(() => {
     if (matchId) {
@@ -4975,9 +5039,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     await fetchRunners();
 });
 </script>
-
-
-
             </center>
            
         </div>
