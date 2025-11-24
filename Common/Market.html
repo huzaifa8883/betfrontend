@@ -4201,6 +4201,436 @@ document.addEventListener("DOMContentLoaded", async () => {
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
 
 
+<!-- <script>
+const socket = io("http://localhost:5000");
+// const ordersUrl = "http://localhost:5000";
+
+new Vue({
+  el: "#app",
+  data() {
+    return {
+      UnMatched: [],
+      Matched: [],
+      selectedMatchId: null,
+      isConnected: false,
+      _betsTimer: null
+    };
+  },
+
+  filters: {
+    format(v) {
+      if (!v) return "";
+      return Number(v).toLocaleString();
+    }
+  },
+
+  methods: {
+    upsertOrders(targetList, newOrders, status) {
+      const map = {};
+      targetList.forEach(o => { map[o.orderId] = o; });
+
+      newOrders.forEach(o => {
+        const id = o.orderId || o.requestId;
+        map[id] = {
+          orderId: id,
+          rn: o.runnerName || o.selectionId,
+          up: o.price,
+          us: o.size,
+          mp: o.price,
+          ms: o.size,
+          bs: (o.side || o.type || "").toUpperCase(),
+          matchId: o.matchId || o.marketId,
+          status
+        };
+      });
+
+      return Object.values(map);
+    },
+
+    async fetchUnMatched() {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${ordersUrl}/orders/unmatched?matchId=${this.selectedMatchId}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        let list = await res.json();
+        if (!Array.isArray(list)) list = list.orders || [];
+
+        this.UnMatched = this.upsertOrders(this.UnMatched, list, "PENDING");
+        console.log("🟢 UnMatched merged:", this.UnMatched);
+      } catch (err) {
+        console.error("❌ Unmatched fetch error:", err);
+      }
+    },
+
+    async fetchMatched() {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${ordersUrl}/orders/matched?matchId=${this.selectedMatchId}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        let list = await res.json();
+        if (!Array.isArray(list)) list = list.orders || [];
+
+        this.Matched = this.upsertOrders(this.Matched, list, "MATCHED");
+        console.log("🟢 Matched merged:", this.Matched);
+      } catch (err) {
+        console.error("❌ Matched fetch error:", err);
+      }
+    },
+
+    refreshBets() {
+      console.log("🔄 Refreshing bets...");
+      return Promise.all([this.fetchUnMatched(), this.fetchMatched()]);
+    },
+
+    handleOrdersUpdate(data) {
+      console.log("📡 Socket update:", data);
+      if (!data || !Array.isArray(data.newOrders)) return;
+
+      const unmatched = data.newOrders.filter(o => o.status === "PENDING");
+      const matched = data.newOrders.filter(o => o.status === "MATCHED");
+
+      this.UnMatched = this.upsertOrders(this.UnMatched, unmatched, "PENDING");
+      this.Matched = this.upsertOrders(this.Matched, matched, "MATCHED");
+
+      console.log("🟢 UI updated via socket:", this.UnMatched.length, this.Matched.length);
+    }
+  },
+
+  mounted() {
+    const params = new URLSearchParams(window.location.search);
+    this.selectedMatchId = params.get("id");
+
+    if (this.selectedMatchId) {
+      socket.on("connect", () => {
+        console.log("⚡ Connected to server");
+        this.isConnected = true;
+
+        const token = localStorage.getItem("token");
+        socket.emit("JoinMatch", { matchId: this.selectedMatchId, token }, ack => {
+          console.log("📡 JoinMatch ack:", ack);
+          this.refreshBets();
+        });
+      });
+    }
+
+    socket.on("disconnect", () => {
+      console.log("❌ Disconnected");
+      this.isConnected = false;
+    });
+
+    socket.on("ordersUpdated", this.handleOrdersUpdate);
+
+    this._betsTimer = setInterval(() => {
+      if (this.selectedMatchId && this.isConnected) {
+        this.refreshBets();
+      }
+    }, 5000);
+  },
+
+  beforeDestroy() {
+    if (this._betsTimer) clearInterval(this._betsTimer);
+    socket.off("connect");
+    socket.off("disconnect");
+    socket.off("ordersUpdated");
+  }
+});
+</script> -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<!-- <script>
+const socket = io("http://localhost:5000");
+const matchId = new URLSearchParams(window.location.search).get("id");
+const token = localStorage.getItem("token");
+
+let UnMatched = [];
+let Matched = [];
+let runnerPnL = {};
+let allRunners = [];
+
+// ---------------------------
+// Utilities
+// ---------------------------
+function format(n) {
+    return Number(n || 0).toLocaleString();
+}
+
+// ---------------------------
+// USER INFO (WALLET + LIABILITY)
+// ---------------------------
+async function updateUserWallet() {
+    if (!token) return;
+
+    try {
+        const res = await fetch("http://localhost:5000/api/users/latest", {
+            headers: { "Authorization": "Bearer " + token }
+        });
+        const data = await res.json();
+        if (data.success && data.user) {
+            const user = data.user;
+
+            // Navbar username + role
+            const userBtn = document.getElementById("navbar-user");
+            if (userBtn) userBtn.innerHTML = `${user.username} (${user.role}) <i class="fas fa-caret-down"></i>`;
+
+            // Wallet balance
+            const walletBalance = document.querySelector(".wallet-balance");
+            if (walletBalance) walletBalance.textContent = `B: ${Math.floor(user.wallet_balance ?? 0)}`;
+
+            // Wallet exposure/liability
+            const walletExposure = document.querySelector(".wallet-exposure");
+            if (walletExposure) walletExposure.textContent = `| L: -${Math.floor(user.liable ?? 0)}`;
+        }
+    } catch (err) {
+        console.error("Error loading latest user info:", err);
+    }
+}
+
+// ---------------------------
+// PNL CALCULATIONS
+// ---------------------------
+function calculateRunnerPnL(runnerName) {
+  let profit = 0;
+  let liability = 0;
+  const normalizedRunnerName = runnerName.trim().toLowerCase();
+
+  Matched.forEach(order => {
+    const rn = (order.rn || "").trim().toLowerCase();
+    const odds = Number(order.mp || 0);
+    const stake = Number(order.ms || 0);
+    const side = (order.bs || "").toUpperCase();
+
+    if (!rn || odds === 0 || stake === 0) return;
+
+    if (rn === normalizedRunnerName) {
+      // Bets on this runner
+      if (side === "B") {
+        profit += (odds - 1) * stake;
+      } else if (side === "L") {
+        liability += (odds - 1) * stake;
+      }
+    } else {
+      // Bets on other runners affect this runner
+      if (side === "B") {
+        liability += stake; // Back on other runner increases this runner's liability
+      } else if (side === "L") {
+        profit += stake; // Lay on other runner increases this runner's profit
+      }
+    }
+  });
+
+  return { profit, liability, net: profit - liability };
+}
+function updateRunnerPnL() {
+  const matchedRunners = [...new Set(Matched.map(o => o.rn))];
+  allRunners = [...new Set([...allRunners, ...matchedRunners])];
+  runnerPnL = {};
+
+  allRunners.forEach(runner => {
+    const { profit, liability, net } = calculateRunnerPnL(runner);
+    runnerPnL[runner] = { profit, liability, net };
+  });
+}
+// ---------------------------
+// RENDER TABLES
+// ---------------------------
+function render() {
+  updateRunnerPnL();
+
+  // --- Unmatched Orders ---
+  const ub = document.getElementById("unmatched-body");
+  ub.innerHTML = "";
+  UnMatched.forEach(o => {
+    const tr = document.createElement("tr");
+    tr.className = o.bs === "B" ? "back" : "lay";
+    tr.innerHTML = `
+      <td>${o.rn}</td>
+      <td>${o.up}</td>
+      <td>${format(o.us)}</td>
+      <td><button class="btn-del" onclick="cancelOrder('${o.orderId}')">X</button></td>
+    `;
+    ub.appendChild(tr);
+  });
+  document.getElementById("unmatched-count").textContent = UnMatched.length;
+  document.getElementById("cancelAllBtn").style.display = UnMatched.length > 0 ? "inline-block" : "none";
+
+  // --- Matched Orders ---
+  const mb = document.getElementById("matched-body");
+  mb.innerHTML = "";
+  allRunners.forEach(runner => {
+    const runnerOrders = Matched.filter(o => o.rn.toLowerCase() === runner.toLowerCase());
+    const { profit = 0, liability = 0, net = 0 } = runnerPnL[runner] || {};
+    const profitClass = profit >= 0 ? "profit" : "liability";
+    const liabilityClass = liability > 0 ? "liability" : "profit";
+
+    if (runnerOrders.length > 0) {
+      runnerOrders.forEach(o => {
+        const tr = document.createElement("tr");
+        tr.className = o.bs === "B" ? "back" : "lay";
+        tr.innerHTML = `
+          <td>${o.rn}</td>
+          <td>${o.mp}</td>
+          <td>${format(o.ms)}</td>
+          <td class="${profitClass}">${format(profit)}</td>
+          <td class="${liabilityClass}">${format(-liability)}</td>
+          <td class="${net >= 0 ? 'profit' : 'liability'}">${format(net)}</td>
+        `;
+        mb.appendChild(tr);
+      });
+    } else {
+      const tr = document.createElement("tr");
+      tr.className = "no-bet";
+      tr.innerHTML = `
+        <td>${runner}</td>
+        <td>-</td>
+        <td>-</td>
+        <td class="${profitClass}">${format(profit)}</td>
+        <td class="${liabilityClass}">${format(-liability)}</td>
+        <td class="${net >= 0 ? 'profit' : 'liability'}">${format(net)}</td>
+      `;
+      mb.appendChild(tr);
+    }
+  });
+  document.getElementById("matched-count").textContent = Matched.length;
+  window.dispatchEvent(new Event("runnerPnLUpdated"));
+  updateUserWallet(); // Refresh wallet
+}
+// Utility to get runner P&L externally
+window.getRunnerAmounts = function(runnerName) {
+    const normalized = runnerName.trim().toLowerCase();
+    const key = Object.keys(runnerPnL).find(k => k.trim().toLowerCase() === normalized);
+    return runnerPnL[key] || 0;
+};
+
+// ---------------------------
+// API HELPERS
+// ---------------------------
+async function fetchUnMatched() {
+    try {
+        const res = await fetch(`${ordersUrl}/orders/unmatched?matchId=${matchId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        let list = await res.json();
+        if (!Array.isArray(list)) list = list.orders || [];
+
+        UnMatched = list.map(o => ({
+            orderId: o.orderId || o.requestId,
+            rn: o.runnerName || o.selectionId,
+            up: o.price,
+            us: o.size,
+            bs: (o.side || o.type || "").toUpperCase()
+        }));
+        render();
+    } catch (e) { console.error("Error fetching unmatched:", e); }
+}
+
+async function fetchMatched() {
+    try {
+        const res = await fetch(`${ordersUrl}/orders/matched?matchId=${matchId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        let list = await res.json();
+        if (!Array.isArray(list)) list = list.orders || [];
+
+        Matched = list.map(o => ({
+            orderId: o.orderId || o.requestId,
+            rn: o.runnerName || o.selectionId,
+            mp: o.price,
+            ms: o.size,
+            bs: (o.side || o.type || "").toUpperCase(),
+            matchId: o.matchId || o.marketId
+        }));
+        render();
+    } catch (e) { console.error("Error fetching matched:", e); }
+}
+
+async function fetchRunners() {
+    try {
+        const res = await fetch(`${ordersUrl}/markets/${matchId}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        const market = await res.json();
+        if (market && Array.isArray(market.runners) && market.runners.length > 0) {
+            allRunners = market.runners.map(r => r.runnerName || r.selectionId);
+        }
+    } catch (e) { console.error("Error fetching runners:", e); }
+}
+
+// Cancel orders
+async function cancelOrder(orderId) {
+    try {
+        await fetch(`${ordersUrl}/orders/cancel/${orderId}`, { method: "POST" });
+        fetchUnMatched();
+        updateUserWallet();
+    } catch (e) { console.error("Error canceling order:", e); }
+}
+
+async function cancelAll() {
+    try {
+        await fetch(`${ordersUrl}/orders/cancelAll?matchId=${matchId}`, { method: "POST" });
+        fetchUnMatched();
+        updateUserWallet();
+    } catch (e) { console.error("Error canceling all:", e); }
+}
+
+// ---------------------------
+// SOCKET EVENTS
+// ---------------------------
+socket.on("connect", async () => {
+    document.getElementById("isConnected").style.display = "inline";
+    socket.emit("JoinMatch", { matchId }, async ack => {
+        await fetchRunners();
+        await fetchUnMatched();
+        await fetchMatched();
+        await updateUserWallet();
+    });
+});
+
+socket.on("disconnect", () => {
+    document.getElementById("isConnected").style.display = "none";
+});
+
+socket.on("ordersUpdated", data => {
+    if (!data || !Array.isArray(data.newOrders)) return;
+    const unmatched = data.newOrders.filter(o => o.status === "PENDING");
+    const matched = data.newOrders.filter(o => o.status === "MATCHED");
+
+    if (unmatched.length) {
+        UnMatched = unmatched.map(o => ({
+            orderId: o.orderId || o.requestId,
+            rn: o.runnerName || o.selectionId,
+            up: o.price,
+            us: o.size,
+            bs: (o.side || o.type || "").toUpperCase()
+        }));
+    }
+
+    if (matched.length) {
+        Matched = matched.map(o => ({
+            orderId: o.orderId || o.requestId,
+            rn: o.runnerName || o.selectionId,
+            mp: o.price,
+            ms: o.size,
+            bs: (o.side || o.type || "").toUpperCase(),
+            matchId: o.matchId || o.marketId
+        }));
+    }
+
+    render();
+});
+
+// ---------------------------
+// AUTO REFRESH
+// ---------------------------
+setInterval(() => {
+    if (matchId) {
+        fetchUnMatched();
+        fetchMatched();
+    }
+}, 5000);
+
+document.addEventListener("DOMContentLoaded", updateUserWallet);
+</script> -->
 <script>
 const socket = io("https://bettingbackending.work.gd");
 const matchId = new URLSearchParams(window.location.search).get("id");
@@ -4245,37 +4675,17 @@ async function updateUserWallet() {
 // ---------------------------
 // PNL CALCULATIONS
 // ---------------------------
-// ---------------------------
-// PNL CALCULATIONS (Pending Bets Included)
-// ---------------------------
 function calculateRunnerPnL(runnerName) {
     const normalized = runnerName.trim().toLowerCase();
     let profit = 0;
     let liability = 0;
 
-    // Matched orders
     Matched.forEach(order => {
         const rn = (order.rn || "").trim().toLowerCase();
         const odds = Number(order.mp || 0);
         const stake = Number(order.ms || 0);
         const side = (order.bs || "").toUpperCase();
-        if (!rn || odds === 0 || stake === 0) return;
 
-        if (rn === normalized) {
-            if (side === "B") profit += (odds - 1) * stake;
-            else if (side === "L") liability += (odds - 1) * stake;
-        } else {
-            if (side === "B") liability += stake;
-            else if (side === "L") profit += stake;
-        }
-    });
-
-    // Unmatched (Pending) orders
-    UnMatched.forEach(order => {
-        const rn = (order.rn || "").trim().toLowerCase();
-        const odds = Number(order.up || 0);
-        const stake = Number(order.us || 0);
-        const side = (order.bs || "").toUpperCase();
         if (!rn || odds === 0 || stake === 0) return;
 
         if (rn === normalized) {
@@ -4293,16 +4703,14 @@ function calculateRunnerPnL(runnerName) {
 function updateRunnerPnL() {
     const matchedRunners = [...new Set(Matched.map(o => o.rn || ""))].filter(r => r);
     const unmatchedRunners = [...new Set(UnMatched.map(o => o.rn || ""))].filter(r => r);
-
     allRunners = [...new Set([...allRunners, ...matchedRunners, ...unmatchedRunners])];
-    runnerPnL = {};
 
+    runnerPnL = {};
     allRunners.forEach(runner => {
         const { profit, liability, net } = calculateRunnerPnL(runner);
         runnerPnL[runner] = { profit, liability, net };
     });
 }
-
 
 // ---------------------------
 // RENDER TABLES
@@ -4567,6 +4975,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await fetchRunners();
 });
 </script>
+
 
 
             </center>
