@@ -4855,21 +4855,21 @@ function calculateRunnerPnL(runnerName) {
     });
 
     // Unmatched (Pending) orders
-    UnMatched.forEach(order => {
-        const rn = (order.rn || "").trim().toLowerCase();
-        const odds = Number(order.up || 0);
-        const stake = Number(order.us || 0);
-        const side = (order.bs || "").toUpperCase();
-        if (!rn || odds === 0 || stake === 0) return;
+    // UnMatched.forEach(order => {
+    //     const rn = (order.rn || "").trim().toLowerCase();
+    //     const odds = Number(order.up || 0);
+    //     const stake = Number(order.us || 0);
+    //     const side = (order.bs || "").toUpperCase();
+    //     if (!rn || odds === 0 || stake === 0) return;
 
-        if (rn === normalized) {
-            if (side === "B") profit += (odds - 1) * stake;
-            else if (side === "L") liability += (odds - 1) * stake;
-        } else {
-            if (side === "B") liability += stake;
-            else if (side === "L") profit += stake;
-        }
-    });
+    //     if (rn === normalized) {
+    //         if (side === "B") profit += (odds - 1) * stake;
+    //         else if (side === "L") liability += (odds - 1) * stake;
+    //     } else {
+    //         if (side === "B") liability += stake;
+    //         else if (side === "L") profit += stake;
+    //     }
+    // });
 
     return { profit, liability, net: profit - liability };
 }
