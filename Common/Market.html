@@ -1787,6 +1787,8 @@ tbody.appendChild(row);
                         data-placement="top"
                         data-html="true"
                         :title="MetadataHtml(runner)">
+                        <span v-if="runner.clothNumber">{{ runner.clothNumber }}.</span>
+
                         {{ runner.runnerName }}
                     </h4>
                     <h4 v-else class="clippable-spacer"
