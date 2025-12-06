@@ -815,6 +815,7 @@
   async function initMarketPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const marketId = urlParams.get('id');
+    console.log(marketId)
     if (!marketId) return;
     await getSportByMarketId(marketId);
   }
