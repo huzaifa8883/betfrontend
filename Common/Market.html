@@ -780,9 +780,12 @@
     }
 </style>
 <script>
+    
+                  const eventTypeId = req.query.eventTypeId;
+if (!eventTypeId) return res.status(400).json({ error: 'eventTypeId is required in query parameters' });
   async function getSportByMarketId(marketId) {
   try {
-    const res = await fetch(`https://bettingbackending.work.gd/api/markets/catalog2?id=${marketId}`);
+    const res = await fetch(`https://bettingbackending.work.gd/api/markets/catalog2?id=${marketId}&eventTypeId=${eventTypeId}`);
     const data = await res.json();
 
     console.log("Catalog2 API response:", data);
