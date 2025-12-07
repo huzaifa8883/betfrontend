@@ -1396,11 +1396,10 @@ row.innerHTML = `
 // Wait until it's in the DOM
 setTimeout(() => {
   const matchLink = row.querySelector('.match-link');
-const eventTypeId = 4;
   if (matchLink) {
     matchLink.addEventListener('click', (e) => {
       e.stopPropagation(); // prevent parent events
-      window.location.href = `/Common/Market.html?id=${match.matchId}&eventTypeId=${eventTypeId}`;
+      window.location.href = `/Common/Market.html?id=${match.matchId}`;
     });
   }
 }, 0);
