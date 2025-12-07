@@ -780,33 +780,27 @@
     }
 </style>
 <script>
-    
- 
- async function getSportByMarketId() {
+  async function getSportByMarketId(marketId) {
   try {
-    const urlParams = new URLSearchParams(window.location.search); // <-- pehle define karo
-    const marketId = urlParams.get('id');
-    const eventTypeId = urlParams.get('eventTypeId'); // ab required hai
-
-    if (!marketId || !eventTypeId) {
-      console.error("marketId or eventTypeId missing in URL");
-      return;
-    }
-
-    const res = await fetch(`https://bettingbackending.work.gd/api/markets/catalog2?id=${marketId}&eventTypeId=${eventTypeId}`);
+    const res = await fetch(`https://bettingbackending.work.gd/api/markets/catalog2?id=${marketId}`);
     const data = await res.json();
 
     console.log("Catalog2 API response:", data);
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromParam = urlParams.get('from'); // 'inplay' ya null
+
+  
+
+    // document.querySelector('.green-upper-text').textContent = displayStatus;
+
     const matchName = data.eventName || data.match || 'Unknown Match';
     document.title = `${matchName} | BetPro`;
 
-    // Yahan baaki DOM update logic add kar do...
   } catch (error) {
     console.error("Error fetching sport by marketId:", error);
   }
 }
-
 
 
   async function initMarketPage() {
@@ -821,7 +815,6 @@
   async function initMarketPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const marketId = urlParams.get('id');
-    console.log(marketId)
     if (!marketId) return;
     await getSportByMarketId(marketId);
   }
