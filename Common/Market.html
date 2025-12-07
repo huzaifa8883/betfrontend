@@ -784,7 +784,8 @@
  
   async function getSportByMarketId(marketId) {
   try {
-    const res = await fetch(`https://bettingbackending.work.gd/api/markets/catalog2?id=${marketId}`);
+    const eventTypeId = urlParams.get('eventTypeId'); // ab required hai
+    const res = await fetch(`https://bettingbackending.work.gd/api/markets/catalog2?id=${marketId}&eventTypeId=${eventTypeId}`);
     const data = await res.json();
 
     console.log("Catalog2 API response:", data);
