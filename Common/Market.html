@@ -5312,7 +5312,7 @@ Vue.component('runner-aggregate', {
         let ifrEl = document.querySelector("#livesc");
         if (ifrEl != null) {
             setTimeout(function () {
-                ifrEl.src = `https://bettingbackending.work.gd/api/scorecard/${marketId}`;
+                ifrEl.src = `https://bettingbackending.work.gd/api/markets/scorecard/${marketId}`;
             }, 1000);
         }
 
