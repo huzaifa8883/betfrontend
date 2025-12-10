@@ -5304,15 +5304,14 @@ Vue.component('runner-aggregate', {
             setInterval(removeTabs, 500);
             setInterval(resizeiframe, 500);
 
-               const ifrEl = document.querySelector("#livesc");
-    if (ifrEl != null) {
-        // Load scorecard from our backend
-        ifrEl.src = `https://bettingbackending.work.gd/api/scorecard/${marketId}`;
-
-        // Optional: Live refresh every 15 seconds
-       
-    }
-            setTimeout(function() { PremiumSportsIframeset()});
+            let ifrEl = document.querySelector("#livesc");
+            if (ifrEl != null) {
+                setTimeout(function () { 
+                    ifrEl.src = `https://bpexch.xyz/Common/LiveScoreCard?id=${marketId}`;
+                   
+                }, 2000);
+            }
+            setTimeout(function() { PremiumSportsIframeset()}, 2000);
             
         });
 
@@ -5322,6 +5321,7 @@ Vue.component('runner-aggregate', {
                 document.getElementById("premiumsportsiframediv").innerHTML = '<iframe id="premiumsportsiframe" frameborder="0" scrolling="yes" style="display:block; width:100%; height:800px;" src=""/>';
             };
         }
+
 
         function resizeiframe() {
             if (lastheight != 0) {
