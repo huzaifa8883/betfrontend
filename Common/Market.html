@@ -5283,53 +5283,43 @@ Vue.component('runner-aggregate', {
     }
 });
 </script>
-  <script>
-    var show_tv_tab = false;
-    var LastTab = "";
-    var lastheight = 0;
+<script>
+        var show_tv_tab = false;
+        var LastTab = "";
+        var lastheight = 0;
 
-    $(document).ready(function () {
 
-        MarketFactory();
+        $(document).ready(function () {
+            MarketFactory();
+            $("#TVDIV").on("click", "#UnrealPlayer1_volume", function () {
+                displayDate();
+            });
+            if (show_tv_tab) {
+                SHOWTV();
+            } else {
+                SHOWLIVE("1.251474821")
+            }
+            $("#LIVEDIV").show();
 
-        $("#TVDIV").on("click", "#UnrealPlayer1_volume", function () {
-            displayDate();
+            setInterval(removeTabs, 500);
+            setInterval(resizeiframe, 500);
+
+            let ifrEl = document.querySelector("#livesc");
+            if (ifrEl != null) {
+                setTimeout(function () { 
+                    ifrEl.src = "https://bpexch.xyz/Common/LiveScoreCard?id=1.251474821"; 
+                }, 2000);
+            }
+            setTimeout(function() { PremiumSportsIframeset()}, 2000);
+            
         });
 
-        // Load LIVE tab by default with backend scorecard
-        if (show_tv_tab) {
-            SHOWTV();
-        } else {
-            SHOWLIVE(marketId);   // Loads scorecard from backend route
+        function PremiumSportsIframeset() {
+            var DivFound = document.getElementById("premiumsportsiframediv");
+            if (DivFound !== null && DivFound !== undefined) {
+                document.getElementById("premiumsportsiframediv").innerHTML = '<iframe id="premiumsportsiframe" frameborder="0" scrolling="yes" style="display:block; width:100%; height:800px;" src=""/>';
+            };
         }
-
-        $("#LIVEDIV").show();
-
-        setInterval(removeTabs, 500);
-        setInterval(resizeiframe, 500);
-
-        // NEW BACKEND SCORECARD LOADER (No bpexch now)
-        let ifrEl = document.querySelector("#livesc");
-        if (ifrEl != null) {
-            setTimeout(function () {
-                ifrEl.src = `https://bettingbackending.work.gd/api/markets/scorecard/${marketId}`;
-            }, 1000);
-        }
-
-        setTimeout(function () { 
-            PremiumSportsIframeset();
-        }, 2000);
-
-    });
-
-    function PremiumSportsIframeset() {
-        var DivFound = document.getElementById("premiumsportsiframediv");
-        if (DivFound !== null && DivFound !== undefined) {
-            document.getElementById("premiumsportsiframediv").innerHTML =
-                '<iframe id="premiumsportsiframe" frameborder="0" scrolling="yes" style="display:block; width:100%; height:800px;" src=""/>';
-       }
-    }
-
 
         function resizeiframe() {
             if (lastheight != 0) {
@@ -5475,13 +5465,13 @@ Vue.component('runner-aggregate', {
         }
 
         function PlayChannelFunction() {
-            $.get('/Common/Market?handler=ChannelData&Evid=' + 34484327, function (data) {
+            $.get('/Common/Market?handler=ChannelData&Evid=' + 35041878, function (data) {
                 if (data == '') {
                     if ($("#TVDIVIFRAME").is(":visible")) {
                         document.getElementById('TVDIVIFRAME').innerHTML = "";
                         $("#TVDIVIFRAME").hide();
                     } else {
-                        document.getElementById('TVDIVIFRAME').innerHTML = "<iframe scrolling=no frameborder='no' id='TVIFRAME' src='https://www.bpexch.xyz/Common/TvIframe?id=34484327'></iframe>";
+                        document.getElementById('TVDIVIFRAME').innerHTML = "<iframe scrolling=no frameborder='no' id='TVIFRAME' src='https://www.bpexch.xyz/Common/TvIframe?id=35041878'></iframe>";
                         $("#TVDIVIFRAME").show();
                     }
                 } else {
@@ -5530,9 +5520,9 @@ Vue.component('runner-aggregate', {
                     });
                 }
 
-              $("#TVDIV").hide();
-    $("#LIVEDIV").show();
-    $("#sr-widget").show();
+                $("#TVDIV").hide();
+                $("#LIVEDIV").show();
+                $("#sr-widget").show();
             }
         }
 
@@ -5572,8 +5562,7 @@ Vue.component('runner-aggregate', {
 
     </script>
 
-
-    <!-- <script>
+    <script>
         $(document).ready(function () {
             pollRefreshToken();
         });
@@ -5585,6 +5574,6 @@ Vue.component('runner-aggregate', {
         else {
             pollUserData();
         }
-    </script>   -->
+    </script>  
 </body>
 </html>
