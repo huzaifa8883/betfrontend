@@ -5283,43 +5283,50 @@ Vue.component('runner-aggregate', {
     }
 });
 </script>
-    <script>
-        var show_tv_tab = false;
-        var LastTab = "";
-        var lastheight = 0;
+  <script>
+    var show_tv_tab = false;
+    var LastTab = "";
+    var lastheight = 0;
 
+    $(document).ready(function () {
 
-        $(document).ready(function () {
-            MarketFactory();
-            $("#TVDIV").on("click", "#UnrealPlayer1_volume", function () {
-                displayDate();
-            });
-            if (show_tv_tab) {
-                SHOWTV();
-            } else {
-                SHOWLIVE(marketId)
-            }
-            $("#LIVEDIV").show();
+        MarketFactory();
 
-            setInterval(removeTabs, 500);
-            setInterval(resizeiframe, 500);
-
-            let ifrEl = document.querySelector("#livesc");
-            if (ifrEl != null) {
-                setTimeout(function () { 
-                    ifrEl.src = `https://bpexch.xyz/Common/LiveScoreCard?id=${marketId}`;
-                   
-                }, 2000);
-            }
-            setTimeout(function() { PremiumSportsIframeset()}, 2000);
-            
+        $("#TVDIV").on("click", "#UnrealPlayer1_volume", function () {
+            displayDate();
         });
 
-        function PremiumSportsIframeset() {
-            var DivFound = document.getElementById("premiumsportsiframediv");
-            if (DivFound !== null && DivFound !== undefined) {
-                document.getElementById("premiumsportsiframediv").innerHTML = '<iframe id="premiumsportsiframe" frameborder="0" scrolling="yes" style="display:block; width:100%; height:800px;" src=""/>';
-            };
+        // Load LIVE tab by default with backend scorecard
+        if (show_tv_tab) {
+            SHOWTV();
+        } else {
+            SHOWLIVE(marketId);   // Loads scorecard from backend route
+        }
+
+        $("#LIVEDIV").show();
+
+        setInterval(removeTabs, 500);
+        setInterval(resizeiframe, 500);
+
+        // NEW BACKEND SCORECARD LOADER (No bpexch now)
+        let ifrEl = document.querySelector("#livesc");
+        if (ifrEl != null) {
+            setTimeout(function () {
+                ifrEl.src = `https://bettingbackending.work.gd/api/scorecard/${marketId}`;
+            }, 1000);
+        }
+
+        setTimeout(function () { 
+            PremiumSportsIframeset();
+        }, 2000);
+
+    });
+
+    function PremiumSportsIframeset() {
+        var DivFound = document.getElementById("premiumsportsiframediv");
+        if (DivFound !== null && DivFound !== undefined) {
+            document.getElementById("premiumsportsiframediv").innerHTML =
+                '<iframe id="premiumsportsiframe" frameborder="0" scrolling="yes" style="display:block; width:100%; height:800px;" src=""/>';
         }
 
 
@@ -5522,9 +5529,9 @@ Vue.component('runner-aggregate', {
                     });
                 }
 
-                $("#TVDIV").hide();
-                $("#LIVEDIV").show();
-                $("#sr-widget").show();
+              $("#TVDIV").hide();
+    $("#LIVEDIV").show();
+    $("#sr-widget").show();
             }
         }
 
