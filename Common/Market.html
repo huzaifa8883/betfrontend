@@ -1862,7 +1862,7 @@ tbody.appendChild(row);
                 {{ runner.status }}
             </div>
         </div>
-        <template v-else>
+        <!-- <template v-else>
             <a class="price-price price-back" :id="'B3-' + runner.selectionId" role="button" v-on:click="ShowBetSlip(runner, 'B', Catalog.marketId, 3)">
                 <span class="price-odd">{{ runner.price3 }}</span>
                 <span class="price-amount">{{ runner.size3 | formatForiegn }}</span>
@@ -1891,7 +1891,51 @@ tbody.appendChild(row);
                 <span class="price-odd">{{ runner.lay3 }}</span>
                 <span class="price-amount">{{ runner.ls3 | formatForiegn }}</span>
             </a>
-        </template>
+        </template> -->
+        <!-- <script type="text/x-template" id="runner-aggregate-template"> -->
+    <div class="runner-runner">
+        <h3 class="runner-name">
+            <div class="runner-info">
+                <span class="clippable runner-display-name">
+                    <h4 class="clippable-spacer">{{ runner.runnerName }}</h4>
+                </span>
+            </div>
+        </h3>
+
+        <a class="price-price price-back" :id="'B3-' + runner.selectionId" 
+           role="button" v-on:click="ShowBetSlip(runner, 'B', Catalog.marketId, 3)">
+            <span class="price-odd">{{ displayPrices.price3.toFixed(2) }}</span>
+            <span class="price-amount">{{ runner.size3 | formatForiegn }}</span>
+        </a>
+        <a class="price-price price-back" :id="'B2-' + runner.selectionId" 
+           v-on:click="ShowBetSlip(runner, 'B', Catalog.marketId, 2)">
+            <span class="price-odd">{{ displayPrices.price2.toFixed(2) }}</span>
+            <span class="price-amount">{{ runner.size2 | formatForiegn }}</span>
+        </a>
+        <a class="price-price price-back mb-show" :id="'B1-' + runner.selectionId" 
+           v-on:click="ShowBetSlip(runner, 'B', Catalog.marketId, 1)">
+            <span class="fa fa-long-arrow-up" v-show="runner.indB1 == 'u'"></span>
+            <span class="fa fa-long-arrow-down" v-show="runner.indB1 == 'd'"></span>
+            <span class="price-odd">{{ displayPrices.price1.toFixed(2) }}</span>
+            <span class="price-amount">{{ runner.size1 | formatForiegn }}</span>
+        </a>
+
+        <a class="price-price price-lay ml-4 mb-show" :id="'L1-' + runner.selectionId" 
+           v-on:click="ShowBetSlip(runner, 'L', Catalog.marketId, 1)">
+            <span class="fa fa-long-arrow-up" v-show="runner.indL1 == 'u'"></span>
+            <span class="fa fa-long-arrow-down" v-show="runner.indL1 == 'd'"></span>
+            <span class="price-odd">{{ displayPrices.lay1.toFixed(2) }}</span>
+            <span class="price-amount">{{ runner.ls1 | formatForiegn }}</span>
+        </a>
+        <a class="price-price price-lay" v-on:click="ShowBetSlip(runner, 'L', Catalog.marketId, 2)">
+            <span class="price-odd">{{ displayPrices.lay2.toFixed(2) }}</span>
+            <span class="price-amount">{{ runner.ls2 | formatForiegn }}</span>
+        </a>
+        <a class="price-price price-lay mr-4" v-on:click="ShowBetSlip(runner, 'L', Catalog.marketId, 3)">
+            <span class="price-odd">{{ displayPrices.lay3.toFixed(2) }}</span>
+            <span class="price-amount">{{ runner.ls3 | formatForiegn }}</span>
+        </a>
+    </div>
     </div>
 </div>
                                     </div>
@@ -5232,6 +5276,56 @@ export default {
 </script> -->
 
     
+<script>
+Vue.component('runner-aggregate', {
+    template: '#runner-aggregate-template',
+    props: ['runner', 'Catalog'],
+    data() {
+        return {
+            displayPrices: {
+                price1: parseFloat(this.runner.price1),
+                price2: parseFloat(this.runner.price2),
+                price3: parseFloat(this.runner.price3),
+                lay1: parseFloat(this.runner.lay1),
+                lay2: parseFloat(this.runner.lay2),
+                lay3: parseFloat(this.runner.lay3)
+            },
+            timers: {}
+        };
+    },
+    watch: {
+        'runner.price1'(newVal) { this.smoothUpdate('price1', newVal); },
+        'runner.price2'(newVal) { this.smoothUpdate('price2', newVal); },
+        'runner.price3'(newVal) { this.smoothUpdate('price3', newVal); },
+        'runner.lay1'(newVal) { this.smoothUpdate('lay1', newVal); },
+        'runner.lay2'(newVal) { this.smoothUpdate('lay2', newVal); },
+        'runner.lay3'(newVal) { this.smoothUpdate('lay3', newVal); }
+    },
+    methods: {
+        smoothUpdate(key, newValue) {
+            const target = parseFloat(newValue);
+            if (isNaN(target)) return;
+
+            if (this.timers[key]) cancelAnimationFrame(this.timers[key]);
+
+            const step = () => {
+                const current = this.displayPrices[key];
+                const diff = target - current;
+                if (Math.abs(diff) < 0.01) {
+                    this.displayPrices[key] = target;
+                    return;
+                }
+                this.displayPrices[key] = current + diff * 0.2;
+                this.timers[key] = requestAnimationFrame(step);
+            };
+            this.timers[key] = requestAnimationFrame(step);
+        },
+        ShowBetSlip(runner, type, marketId, level) {
+            this.$emit('betslip', { runner, type, marketId, level });
+        }
+    }
+});
+</script>
     <script>
         var show_tv_tab = false;
         var LastTab = "";
