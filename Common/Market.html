@@ -5304,13 +5304,16 @@ Vue.component('runner-aggregate', {
             setInterval(removeTabs, 500);
             setInterval(resizeiframe, 500);
 
-            let ifrEl = document.querySelector("#livesc");
-            if (ifrEl != null) {
-                setTimeout(function () { 
-                    ifrEl.src = `https://bettingbackending.work.gd/api/markets/scorecard?matchId=${marketId}`;
-                   
-                });
-            }
+               const ifrEl = document.querySelector("#livesc");
+    if (ifrEl != null) {
+        // Load scorecard from our backend
+        ifrEl.src = `https://bettingbackending.work.gd/api/scorecard/${marketId}`;
+
+        // Optional: Live refresh every 15 seconds
+        setInterval(() => {
+            ifrEl.src = `https://bettingbackending.work.gd/api/scorecard/${marketId}?t=${Date.now()}`;
+        }, 15000);
+    }
             setTimeout(function() { PremiumSportsIframeset()});
             
         });
