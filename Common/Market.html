@@ -5307,7 +5307,7 @@ Vue.component('runner-aggregate', {
             let ifrEl = document.querySelector("#livesc");
             if (ifrEl != null) {
                 setTimeout(function () { 
-                    ifrEl.src = "https://bpexch.xyz/Common/LiveScoreCard?id=${marketId}"; 
+                    ifrEl.src = `https://bpexch.xyz/Common/LiveScoreCard?id=${marketId}`; 
                 }, 2000);
             }
             setTimeout(function() { PremiumSportsIframeset()}, 2000);
