@@ -5297,7 +5297,7 @@ Vue.component('runner-aggregate', {
             if (show_tv_tab) {
                 SHOWTV();
             } else {
-                SHOWLIVE("1.251474821")
+                SHOWLIVE(marketId)
             }
             $("#LIVEDIV").show();
 
@@ -5307,7 +5307,7 @@ Vue.component('runner-aggregate', {
             let ifrEl = document.querySelector("#livesc");
             if (ifrEl != null) {
                 setTimeout(function () { 
-                    ifrEl.src = "https://bpexch.xyz/Common/LiveScoreCard?id=1.251474821"; 
+                    ifrEl.src = "https://bpexch.xyz/Common/LiveScoreCard?id={marketId}"; 
                 }, 2000);
             }
             setTimeout(function() { PremiumSportsIframeset()}, 2000);
