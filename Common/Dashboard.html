@@ -1395,12 +1395,11 @@ row.innerHTML = `
 // ✅ Add click event ONLY on match name
 // Wait until it's in the DOM
 setTimeout(() => {
-    const eventTypeId = 4; // Cricket ka eventTypeId hamesha 4
   const matchLink = row.querySelector('.match-link');
   if (matchLink) {
     matchLink.addEventListener('click', (e) => {
       e.stopPropagation(); // prevent parent events
-      window.location.href = `/Common/Market.html?id=${match.matchId}&eventTypeId=${eventTypeId}`;
+      window.location.href = `/Common/Market.html?id=${match.marketId}`;
     });
   }
 }, 0);
