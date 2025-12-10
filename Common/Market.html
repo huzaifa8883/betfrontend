@@ -5523,6 +5523,10 @@ Vue.component('runner-aggregate', {
                 $("#TVDIV").hide();
                 $("#LIVEDIV").show();
                 $("#sr-widget").show();
+                 let ifrEl = document.querySelector("#livesc");
+    if (ifrEl != null) {
+        ifrEl.src = `https://bpexch.xyz/Common/LiveScoreCard?id=${MID}`;
+    }
             }
         }
 
