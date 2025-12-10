@@ -1862,7 +1862,7 @@ tbody.appendChild(row);
                 {{ runner.status }}
             </div>
         </div>
-        <!-- <template v-else>
+        <template v-else>
             <a class="price-price price-back" :id="'B3-' + runner.selectionId" role="button" v-on:click="ShowBetSlip(runner, 'B', Catalog.marketId, 3)">
                 <span class="price-odd">{{ runner.price3 }}</span>
                 <span class="price-amount">{{ runner.size3 | formatForiegn }}</span>
@@ -1891,55 +1891,8 @@ tbody.appendChild(row);
                 <span class="price-odd">{{ runner.lay3 }}</span>
                 <span class="price-amount">{{ runner.ls3 | formatForiegn }}</span>
             </a>
-        </template> -->
-        <!-- <script type="text/x-template" id="runner-aggregate-template"> -->
-    <script type="text/x-template" id="runner-aggregate-template">
-
-    <div class="runner-runner">
-        <h3 class="runner-name">
-            <div class="runner-info">
-                <span class="clippable runner-display-name">
-                    <h4 class="clippable-spacer">{{ runner.runnerName }}</h4>
-                </span>
-            </div>
-        </h3>
-
-        <a class="price-price price-back" :id="'B3-' + runner.selectionId" 
-           role="button" v-on:click="ShowBetSlip(runner, 'B', Catalog.marketId, 3)">
-            <span class="price-odd">{{ displayPrices.price3.toFixed(2) }}</span>
-            <span class="price-amount">{{ runner.size3 | formatForiegn }}</span>
-        </a>
-        <a class="price-price price-back" :id="'B2-' + runner.selectionId" 
-           v-on:click="ShowBetSlip(runner, 'B', Catalog.marketId, 2)">
-            <span class="price-odd">{{ displayPrices.price2.toFixed(2) }}</span>
-            <span class="price-amount">{{ runner.size2 | formatForiegn }}</span>
-        </a>
-        <a class="price-price price-back mb-show" :id="'B1-' + runner.selectionId" 
-           v-on:click="ShowBetSlip(runner, 'B', Catalog.marketId, 1)">
-            <span class="fa fa-long-arrow-up" v-show="runner.indB1 == 'u'"></span>
-            <span class="fa fa-long-arrow-down" v-show="runner.indB1 == 'd'"></span>
-            <span class="price-odd">{{ displayPrices.price1.toFixed(2) }}</span>
-            <span class="price-amount">{{ runner.size1 | formatForiegn }}</span>
-        </a>
-
-        <a class="price-price price-lay ml-4 mb-show" :id="'L1-' + runner.selectionId" 
-           v-on:click="ShowBetSlip(runner, 'L', Catalog.marketId, 1)">
-            <span class="fa fa-long-arrow-up" v-show="runner.indL1 == 'u'"></span>
-            <span class="fa fa-long-arrow-down" v-show="runner.indL1 == 'd'"></span>
-            <span class="price-odd">{{ displayPrices.lay1.toFixed(2) }}</span>
-            <span class="price-amount">{{ runner.ls1 | formatForiegn }}</span>
-        </a>
-        <a class="price-price price-lay" v-on:click="ShowBetSlip(runner, 'L', Catalog.marketId, 2)">
-            <span class="price-odd">{{ displayPrices.lay2.toFixed(2) }}</span>
-            <span class="price-amount">{{ runner.ls2 | formatForiegn }}</span>
-        </a>
-        <a class="price-price price-lay mr-4" v-on:click="ShowBetSlip(runner, 'L', Catalog.marketId, 3)">
-            <span class="price-odd">{{ displayPrices.lay3.toFixed(2) }}</span>
-            <span class="price-amount">{{ runner.ls3 | formatForiegn }}</span>
-        </a>
-    </div>
-     </script>
-
+        </template>
+ 
     </div>
 </div>
                                     </div>
