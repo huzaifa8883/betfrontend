@@ -2,18 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="google" content="notranslate" />    
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Sports Trading Platform">
-    <meta name="keyword" content="sports trading, bet, betfair">
-    <meta name="robots" content="noindex" />
-
     <link rel="shortcut icon" href="/img/favicon/BetPro.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <title>BetPro - Sports Exchange</title>
+    <title>BetPro Exchange - Live Sports Betting</title>
     
     <style>
         * {
@@ -23,336 +17,344 @@
         }
 
         :root {
-            --primary: #0066FF;
-            --primary-dark: #0052CC;
-            --secondary: #00D9FF;
-            --success: #00C48C;
+            --bg-primary: #0D0D2B;
+            --bg-secondary: #161637;
+            --bg-card: #1E1E3F;
+            --accent-1: #FF006E;
+            --accent-2: #8338EC;
+            --accent-3: #3A86FF;
+            --accent-4: #06FFA5;
+            --success: #00FF88;
             --danger: #FF3B69;
-            --warning: #FFB020;
-            --dark: #0A0E27;
-            --dark-800: #131729;
-            --dark-700: #1C1F35;
-            --dark-600: #252942;
-            --dark-500: #2E3348;
-            --light: #F7F9FC;
+            --warning: #FFBE0B;
             --text-primary: #FFFFFF;
-            --text-secondary: #A0AEC0;
-            --border: #2D3142;
-            --back-blue: #4A90E2;
-            --lay-pink: #FF6B9D;
-            --gradient-primary: linear-gradient(135deg, #0066FF 0%, #00D9FF 100%);
-            --gradient-dark: linear-gradient(180deg, #0A0E27 0%, #131729 100%);
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
-            --shadow-xl: 0 12px 40px rgba(0,0,0,0.3);
+            --text-secondary: #B4B4C8;
+            --text-muted: #6E6E8F;
+            --border: rgba(255, 255, 255, 0.08);
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.2);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 30px rgba(102, 126, 234, 0.3);
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--dark);
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* TOP HEADER BAR */
-        .top-bar {
-            background: var(--dark-800);
-            border-bottom: 1px solid var(--border);
-            padding: 0.75rem 0;
+        /* ANIMATED BACKGROUND */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.3;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(131, 56, 236, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 20%, rgba(58, 134, 255, 0.1) 0%, transparent 50%);
+            animation: bgMove 20s ease infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        /* TOP NAVIGATION */
+        .top-nav {
             position: sticky;
             top: 0;
             z-index: 1000;
-            backdrop-filter: blur(10px);
+            background: rgba(13, 13, 43, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        .top-bar-content {
-            max-width: 1600px;
+        .nav-container {
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 1.5rem;
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo-section {
-            display: flex;
             align-items: center;
             gap: 2rem;
         }
 
-        .brand-logo {
+        .logo {
             font-size: 1.75rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
+            font-weight: 900;
+            background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: -0.5px;
-        }
-
-        .quick-links {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .quick-link {
-            color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: color 0.2s;
+            letter-spacing: -1px;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .quick-link:hover {
-            color: var(--primary);
+        .logo i {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .user-section {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .wallet-display {
+        .nav-links {
             display: flex;
             gap: 1.5rem;
             align-items: center;
-            padding: 0.5rem 1rem;
-            background: var(--dark-700);
-            border-radius: 8px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-1);
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .wallet-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            background: var(--bg-card);
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
             border: 1px solid var(--border);
         }
 
         .wallet-item {
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 0.125rem;
         }
 
         .wallet-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+            font-size: 0.7rem;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .wallet-value {
-            font-size: 1rem;
+        .wallet-amount {
+            font-size: 0.95rem;
             font-weight: 700;
             color: var(--text-primary);
         }
 
-        .wallet-value.positive {
-            color: var(--success);
-        }
-
-        .wallet-value.negative {
-            color: var(--danger);
-        }
-
-        .user-menu {
+        .user-profile {
             position: relative;
         }
 
         .user-btn {
-            background: var(--dark-700);
-            border: 1px solid var(--border);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            color: var(--text-primary);
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            background: var(--gradient-1);
+            padding: 0.65rem 1.25rem;
+            border-radius: 50px;
+            border: none;
+            color: white;
             font-weight: 600;
-            transition: all 0.2s;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-glow);
         }
 
         .user-btn:hover {
-            background: var(--dark-600);
-            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(102, 126, 234, 0.5);
         }
 
         .user-avatar {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: var(--gradient-primary);
+            background: rgba(255,255,255,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.875rem;
         }
 
-        /* MAIN LAYOUT */
-        .main-container {
-            display: flex;
-            max-width: 1600px;
-            margin: 0 auto;
-            gap: 1.5rem;
-            padding: 1.5rem;
-            min-height: calc(100vh - 80px);
-        }
-
-        /* SIDEBAR NAVIGATION */
-        .sidebar {
-            width: 280px;
-            background: var(--dark-800);
-            border-radius: 12px;
-            padding: 1.5rem;
-            height: fit-content;
-            position: sticky;
-            top: 100px;
+        .dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: var(--bg-card);
             border: 1px solid var(--border);
+            border-radius: 12px;
+            min-width: 200px;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
         }
 
-        .nav-section {
-            margin-bottom: 2rem;
+        .dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
 
-        .nav-section-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
-
-        .nav-items {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .nav-item {
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1.25rem;
             color: var(--text-secondary);
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-weight: 500;
+            font-size: 0.9rem;
             transition: all 0.2s;
-            cursor: pointer;
-            border: 1px solid transparent;
+            border-bottom: 1px solid var(--border);
         }
 
-        .nav-item:hover {
-            background: var(--dark-700);
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.05);
             color: var(--text-primary);
-            border-color: var(--border);
+            padding-left: 1.5rem;
         }
 
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-            font-weight: 600;
+        .mobile-menu-btn {
+            display: none;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            cursor: pointer;
         }
 
-        .nav-item i {
-            width: 20px;
-            text-align: center;
-            font-size: 1.125rem;
+        /* MAIN CONTAINER */
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
         }
 
-        .nav-badge {
-            margin-left: auto;
-            background: var(--danger);
-            color: white;
-            padding: 0.125rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        /* MAIN CONTENT */
-        .content-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        /* FEATURED BANNER */
-        .featured-banner {
-            background: var(--gradient-primary);
-            border-radius: 16px;
-            padding: 2.5rem;
+        /* HERO SECTION */
+        .hero-section {
+            background: var(--gradient-1);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 2rem;
             position: relative;
             overflow: hidden;
             box-shadow: var(--shadow-lg);
         }
 
-        .featured-banner::before {
+        .hero-section::before {
             content: '';
             position: absolute;
             top: -50%;
-            right: -10%;
-            width: 500px;
-            height: 500px;
-            background: rgba(255,255,255,0.1);
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
             border-radius: 50%;
+            animation: heroFloat 8s ease-in-out infinite;
         }
 
-        .featured-content {
+        @keyframes heroFloat {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-30px, -30px); }
+        }
+
+        .hero-content {
             position: relative;
             z-index: 1;
         }
 
-        .featured-title {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
         }
 
-        .featured-subtitle {
-            font-size: 1.125rem;
-            opacity: 0.9;
-            margin-bottom: 1.5rem;
+        .hero-subtitle {
+            font-size: 1.15rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+            max-width: 600px;
         }
 
-        .featured-actions {
+        .hero-actions {
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
+            padding: 0.85rem 2rem;
+            border-radius: 50px;
             font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            transition: all 0.2s;
+            transition: all 0.3s;
             border: none;
             cursor: pointer;
-            font-size: 0.9375rem;
+            font-size: 0.95rem;
+            white-space: nowrap;
         }
 
-        .btn-primary {
+        .btn-white {
             background: white;
-            color: var(--primary);
+            color: var(--accent-2);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        .btn-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.3);
         }
 
         .btn-outline {
             background: transparent;
             color: white;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.5);
         }
 
         .btn-outline:hover {
@@ -360,789 +362,846 @@
             border-color: white;
         }
 
-        /* LIVE MATCHES SECTION */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
+        /* STATS SECTION */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .stat-card:nth-child(2)::before {
+            background: var(--gradient-3);
+        }
+
+        .stat-card:nth-child(3)::before {
+            background: var(--gradient-4);
+        }
+
+        .stat-card:nth-child(4)::before {
+            background: var(--gradient-2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: rgba(58, 134, 255, 0.1);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: rgba(6, 255, 165, 0.1);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background: rgba(255, 107, 157, 0.1);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* TABS NAVIGATION */
+        .tabs-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: var(--bg-card);
+            padding: 0.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .tabs-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .tab-btn:not(.active):hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
+        }
+
+        .tab-badge {
+            background: var(--danger);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        /* MATCH CARDS */
         .section-title {
             font-size: 1.5rem;
             font-weight: 700;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
 
-        .live-indicator {
-            width: 8px;
-            height: 8px;
+        .live-dot {
+            width: 10px;
+            height: 10px;
             background: var(--danger);
             border-radius: 50%;
-            animation: pulse 2s infinite;
+            animation: livePulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 59, 105, 0.7); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 10px rgba(255, 59, 105, 0); }
         }
 
-        .section-nav {
-            display: flex;
-            gap: 0.5rem;
-            background: var(--dark-800);
-            padding: 0.25rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        .section-nav-btn {
-            padding: 0.5rem 1rem;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-        }
-
-        .section-nav-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .section-nav-btn:hover:not(.active) {
-            color: var(--text-primary);
-            background: var(--dark-700);
-        }
-
-        /* MATCH CARDS */
-        .matches-grid {
+        .matches-container {
             display: grid;
-            gap: 1rem;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
         }
 
         .match-card {
-            background: var(--dark-800);
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.2s;
+            border-radius: 20px;
+            padding: 1.75rem;
+            transition: all 0.3s;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .match-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-3);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .match-card:hover::before {
+            transform: scaleX(1);
         }
 
         .match-card:hover {
-            border-color: var(--primary);
+            border-color: rgba(255,255,255,0.2);
+            transform: translateY(-4px);
             box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
         }
 
         .match-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .match-time {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .match-status {
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .match-status.live {
-            background: rgba(255, 59, 105, 0.2);
-            color: var(--danger);
-        }
-
-        .match-status.upcoming {
-            background: rgba(0, 196, 140, 0.2);
-            color: var(--success);
-        }
-
-        .match-teams {
             margin-bottom: 1.25rem;
         }
 
-        .match-name {
-            font-size: 1.125rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .match-info {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .match-info-item {
+        .match-time-info {
             display: flex;
             align-items: center;
-            gap: 0.375rem;
-        }
-
-        .odds-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 0.75rem;
         }
 
-        .odds-box {
-            background: var(--dark-700);
-            border-radius: 8px;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
+        .match-time {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .odds-label {
+        .match-status {
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
             font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .odds-values {
+        .match-status.live {
+            background: linear-gradient(135deg, #FF006E 0%, #FF3B69 100%);
+            color: white;
+            animation: statusGlow 2s infinite;
+        }
+
+        @keyframes statusGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 110, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 0, 110, 0.8); }
+        }
+
+        .match-status.upcoming {
+            background: rgba(6, 255, 165, 0.15);
+            color: var(--accent-4);
+        }
+
+        .match-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .match-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .meta-item i {
+            color: var(--accent-3);
+        }
+
+        /* ODDS SECTION */
+        .odds-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .odds-team {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .odds-team-name {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .odds-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.5rem;
         }
 
-        .odds-value {
-            padding: 0.5rem;
-            border-radius: 6px;
+        .odd-box {
+            border-radius: 8px;
+            padding: 0.65rem;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
+            transition: all 0.3s;
+            border: 1px solid transparent;
         }
 
-        .odds-value.back {
-            background: rgba(74, 144, 226, 0.2);
-            border: 1px solid var(--back-blue);
+        .odd-box.back {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.15) 0%, rgba(74, 144, 226, 0.05) 100%);
+            border-color: rgba(74, 144, 226, 0.3);
         }
 
-        .odds-value.lay {
-            background: rgba(255, 107, 157, 0.2);
-            border: 1px solid var(--lay-pink);
+        .odd-box.back:hover {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.25) 0%, rgba(74, 144, 226, 0.15) 100%);
+            transform: translateY(-2px);
         }
 
-        .odds-price {
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--text-primary);
+        .odd-box.lay {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.15) 0%, rgba(255, 107, 157, 0.05) 100%);
+            border-color: rgba(255, 107, 157, 0.3);
         }
 
-        .odds-value.back .odds-price {
-            color: var(--back-blue);
+        .odd-box.lay:hover {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.25) 0%, rgba(255, 107, 157, 0.15) 100%);
+            transform: translateY(-2px);
         }
 
-        .odds-value.lay .odds-price {
-            color: var(--lay-pink);
+        .odd-price {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
         }
 
-        .odds-size {
+        .odd-box.back .odd-price {
+            color: #4A90E2;
+        }
+
+        .odd-box.lay .odd-price {
+            color: #FF6B9D;
+        }
+
+        .odd-size {
             font-size: 0.75rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
         }
 
-        /* CASINO GAMES SLIDER */
-        .games-section {
-            background: var(--dark-800);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .games-slider {
+        /* CASINO SECTION */
+        .casino-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
         }
 
-        .game-card {
+        .casino-card {
             position: relative;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
             aspect-ratio: 3/4;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s;
             border: 2px solid transparent;
         }
 
-        .game-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
+        .casino-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border-color: rgba(102, 126, 234, 0.5);
         }
 
-        .game-card img {
+        .casino-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.4s;
         }
 
-        .game-overlay {
+        .casino-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .casino-overlay {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%);
+            display: flex;
+            align-items: flex-end;
+            padding: 1.25rem;
             opacity: 0;
             transition: opacity 0.3s;
         }
 
-        .game-card:hover .game-overlay {
+        .casino-card:hover .casino-overlay {
             opacity: 1;
         }
 
-        .game-title {
+        .casino-name {
             font-weight: 700;
-            font-size: 0.875rem;
+            font-size: 1rem;
             color: white;
         }
 
-        /* RACE CARDS */
-        .race-section {
-            background: var(--dark-800);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .race-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .race-tab {
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-weight: 600;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
-        }
-
-        .race-tab.active {
-            color: var(--primary);
-        }
-
-        .race-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--primary);
-        }
-
-        .race-items {
+        /* RACING SECTION */
+        .race-list {
             display: grid;
-            gap: 0.75rem;
+            gap: 1rem;
+            margin-bottom: 3rem;
         }
 
-        .race-item {
+        .race-card {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem;
-            background: var(--dark-700);
-            border-radius: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 1.25rem 1.5rem;
+            border-radius: 16px;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
+            transition: all 0.3s;
         }
 
-        .race-item:hover {
-            border-color: var(--primary);
-            background: var(--dark-600);
+        .race-card:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateX(4px);
         }
 
-        .race-details {
+        .race-info {
             display: flex;
-            gap: 1rem;
             align-items: center;
+            gap: 1.5rem;
         }
 
         .race-time {
-            font-weight: 700;
-            color: var(--primary);
-            min-width: 80px;
-        }
-
-        .race-venue {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .race-action {
-            color: var(--text-secondary);
-        }
-
-        /* STATS CARDS */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background: var(--dark-800);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-value {
-            font-size: 2rem;
             font-weight: 800;
-            background: var(--gradient-primary);
+            font-size: 1.1rem;
+            background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
+            min-width: 90px;
         }
 
-        .stat-change {
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
+        .race-name {
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        .stat-change.positive {
-            color: var(--success);
+        .race-arrow {
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            transition: all 0.3s;
         }
 
-        .stat-change.negative {
-            color: var(--danger);
+        .race-card:hover .race-arrow {
+            color: var(--text-primary);
+            transform: translateX(4px);
         }
 
         /* FOOTER */
         .footer {
-            background: var(--dark-800);
+            background: var(--bg-secondary);
             border-top: 1px solid var(--border);
-            padding: 2rem 0;
-            margin-top: 3rem;
+            padding: 3rem 1.5rem 2rem;
+            margin-top: 4rem;
         }
 
         .footer-content {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 1.5rem;
-            text-align: center;
         }
 
         .footer-links {
             display: flex;
             justify-content: center;
-            gap: 2rem;
-            margin-bottom: 1rem;
+            gap: 2.5rem;
+            margin-bottom: 2rem;
             flex-wrap: wrap;
         }
 
         .footer-link {
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.875rem;
-            transition: color 0.2s;
+            font-size: 0.9rem;
+            transition: all 0.3s;
         }
 
         .footer-link:hover {
-            color: var(--primary);
+            color: var(--text-primary);
         }
 
         .footer-text {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
         }
 
-        /* RESPONSIVE */
-        @media (max-width: 1200px) {
-            .main-container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                position: relative;
-                top: 0;
-            }
-
-            .nav-items {
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
+        /* LOADING STATE */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
         }
 
-        @media (max-width: 768px) {
-            .top-bar-content {
-                flex-wrap: wrap;
-                gap: 1rem;
-            }
-
-            .quick-links {
-                display: none;
-            }
-
-            .wallet-display {
-                flex-direction: column;
-                gap: 0.5rem;
-                align-items: flex-start;
-            }
-
-            .featured-banner {
-                padding: 1.5rem;
-            }
-
-            .featured-title {
-                font-size: 1.5rem;
-            }
-
-            .odds-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .games-slider {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            }
-        }
-
-        /* LOADING ANIMATION */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent-2);
             border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 1s ease-in-out infinite;
+            animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .hidden {
-            display: none !important;
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 992px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .wallet-info {
+                display: none;
+            }
+
+            .hero-section {
+                padding: 2rem;
+            }
+
+            .hero-title {
+                font-size: 1.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .odds-container {
+                grid-template-columns: 1fr;
+            }
+
+            .casino-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+        }
+
+        @media (max-width: 576px) {
+            .nav-container {
+                padding: 0.75rem 1rem;
+            }
+
+            .logo {
+                font-size: 1.35rem;
+            }
+
+            .main-wrapper {
+                padding: 1.5rem 1rem;
+            }
+
+            .hero-section {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .match-card {
+                padding: 1.25rem;
+            }
+
+            .match-name {
+                font-size: 1.05rem;
+            }
+
+            .tabs-nav {
+                padding: 0.35rem;
+            }
+
+            .tab-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
         }
 
         /* SCROLLBAR */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--dark-800);
+            background: var(--bg-primary);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--dark-600);
-            border-radius: 4px;
+            background: var(--bg-card);
+            border-radius: 5px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
+            background: var(--accent-2);
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
-    <!-- TOP BAR -->
-    <div class="top-bar">
-        <div class="top-bar-content">
-            <div class="logo-section">
-                <div class="brand-logo">BetPro</div>
-                <div class="quick-links">
-                    <a href="/Common/Dashboard" class="quick-link">
-                        <i class="fas fa-home"></i> Dashboard
+    <div class="bg-animation"></div>
+
+    <!-- TOP NAVIGATION -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <a href="/Common/Dashboard" class="logo">
+                <i class="fas fa-bolt"></i>
+                BetPro
+            </a>
+
+            <div class="nav-links">
+                <a href="/Common/Dashboard" class="nav-link">Dashboard</a>
+                <a href="/Common/Result" class="nav-link">Results</a>
+                <a href="#" class="nav-link" onclick="showMarketRules(); return false;">Rules</a>
+            </div>
+
+            <div class="wallet-info">
+                <div class="wallet-item">
+                    <span class="wallet-label">Balance</span>
+                    <span class="wallet-amount user-balance">-</span>
+                </div>
+                <div class="wallet-item">
+                    <span class="wallet-label">Exposure</span>
+                    <span class="wallet-amount user-liable">-</span>
+                </div>
+            </div>
+
+            <div class="user-profile">
+                <button class="user-btn" onclick="toggleDropdown()">
+                    <div class="user-avatar">U</div>
+                    <span id="username-display">User</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown" id="user-dropdown">
+                    <a href="/Customer/Ledger/" class="dropdown-item">
+                        <i class="fas fa-file-invoice"></i> Statement
                     </a>
-                    <a href="#" class="quick-link" onclick="showMarketRules(); return false;">
-                        <i class="fas fa-info-circle"></i> Rules
+                    <a href="/Customer/ProfitLoss/" class="dropdown-item">
+                        <i class="fas fa-chart-line"></i> Profit & Loss
                     </a>
-                    <a href="/Common/Result" class="quick-link">
-                        <i class="fas fa-trophy"></i> Results
+                    <a href="/Customer/Bets" class="dropdown-item">
+                        <i class="fas fa-history"></i> Bet History
+                    </a>
+                    <a href="/Customer/Profile" class="dropdown-item">
+                        <i class="fas fa-user"></i> Profile
+                    </a>
+                    <a href="/" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </div>
             </div>
-            
-            <div class="user-section">
-                <div class="wallet-display">
-                    <div class="wallet-item">
-                        <span class="wallet-label">Balance</span>
-                        <span class="wallet-value user-balance positive">-</span>
-                    </div>
-                    <div class="wallet-item">
-                        <span class="wallet-label">Liable</span>
-                        <span class="wallet-value user-liable negative">-</span>
-                    </div>
-                    <div class="wallet-item">
-                        <span class="wallet-label">Active Bets</span>
-                        <span class="wallet-value user-bets">0</span>
-                    </div>
+
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        <!-- HERO SECTION -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">🚀 Welcome to BetPro Exchange</h1>
+                <p class="hero-subtitle">Experience the thrill of live betting with the best odds across cricket, football, tennis, and more. Your winning journey starts here!</p>
+                <div class="hero-actions">
+                    <a href="/Common/BetProGames?GameId=9022" class="btn btn-white">
+                        <i class="fas fa-plane-departure"></i>
+                        Play Aviator Now
+                    </a>
+                    <a href="/Common/Sap.html" class="btn btn-outline">
+                        <i class="fas fa-book-open"></i>
+                        Explore Sportsbook
+                    </a>
                 </div>
-                
-                <div class="user-menu">
-                    <button class="user-btn" id="navbar-user" onclick="toggleUserMenu()">
-                        <div class="user-avatar">U</div>
-                        <span>User</span>
-                        <i class="fas fa-caret-down"></i>
-                    </button>
-                    <div class="dropdown-menu hidden" id="user-dropdown">
-                        <a class="dropdown-item" href="/Customer/Ledger/">Statement</a>
-                        <a class="dropdown-item" href="/Customer/ProfitLoss/">Profit Loss</a>
-                        <a class="dropdown-item" href="/Customer/Bets">Bet History</a>
-                        <a class="dropdown-item" href="/Customer/Profile">Profile</a>
-                        <a class="dropdown-item" id="btn-logout" href="/">Logout</a>
-                    </div>
+            </div>
+        </section>
+
+        <!-- STATS SECTION -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-broadcast-tower"></i>
+                </div>
+                <div class="stat-label">Live Matches</div>
+                <div class="stat-value" id="totalInPlayCount">0</div>
+                <div class="stat-change">
+                    <i class="fas fa-circle"></i> Broadcasting now
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="stat-label">Your Balance</div>
+                <div class="stat-value user-balance">-</div>
+                <div class="stat-change">
+                    Available to bet
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="stat-label">Active Bets</div>
+                <div class="stat-value user-bets">0</div>
+                <div class="stat-change">
+                    Currently running
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-fire-flame-curved"></i>
+                </div>
+                <div class="stat-label">Today's Action</div>
+                <div class="stat-value" id="todayMatches">0</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-trend-up"></i> Total events
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- MAIN CONTAINER -->
-    <div class="main-container">
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="nav-section">
-                <h3 class="nav-section-title">Sports</h3>
-                <div class="nav-items">
-                    <a href="#cricket" class="nav-item active" data-sport="cricket">
-                        <i class="fas fa-baseball-ball"></i>
-                        <span>Cricket</span>
-                        <span class="nav-badge" id="cricketMatchCount">0</span>
-                    </a>
-                    <a href="#football" class="nav-item" data-sport="football">
-                        <i class="fas fa-futbol"></i>
-                        <span>Football</span>
-                        <span class="nav-badge" id="footballMatchCount">0</span>
-                    </a>
-                    <a href="#tennis" class="nav-item" data-sport="tennis">
-                        <i class="fas fa-table-tennis"></i>
-                        <span>Tennis</span>
-                        <span class="nav-badge" id="tennisMatchCount">0</span>
-                    </a>
-                    <a href="#horse-racing" class="nav-item" data-sport="horse">
-                        <i class="fas fa-horse"></i>
-                        <span>Horse Racing</span>
-                    </a>
-                    <a href="#greyhound" class="nav-item" data-sport="greyhound">
-                        <i class="fas fa-dog"></i>
-                        <span>Greyhound</span>
-                    </a>
-                </div>
-            </div>
+        <!-- SPORTS TABS -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchSport('cricket')">
+                <i class="fas fa-baseball-ball"></i> Cricket
+                <span class="tab-badge" id="cricketBadge">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchSport('football')">
+                <i class="fas fa-futbol"></i> Football
+                <span class="tab-badge" id="footballBadge">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchSport('tennis')">
+                <i class="fas fa-table-tennis-paddle-ball"></i> Tennis
+                <span class="tab-badge" id="tennisBadge">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchSport('horse')">
+                <i class="fas fa-horse"></i> Horse Racing
+            </button>
+            <button class="tab-btn" onclick="switchSport('greyhound')">
+                <i class="fas fa-dog"></i> Greyhound
+            </button>
+            <button class="tab-btn" onclick="switchSport('casino')">
+                <i class="fas fa-dice"></i> Casino
+            </button>
+        </div>
 
-            <div class="nav-section">
-                <h3 class="nav-section-title">Casino</h3>
-                <div class="nav-items">
-                    <a href="/Common/RSC.html" class="nav-item">
-                        <i class="fas fa-star"></i>
-                        <span>RoyalStar Casino</span>
-                    </a>
-                    <a href="/Common/Games.html" class="nav-item">
-                        <i class="fas fa-gamepad"></i>
-                        <span>Star Casino</span>
-                    </a>
-                    <a href="/Common/WorldCasino.html" class="nav-item">
-                        <i class="fas fa-globe"></i>
-                        <span>World Casino</span>
-                    </a>
-                    <a href="/Common/Dream.html" class="nav-item">
-                        <i class="fas fa-crown"></i>
-                        <span>Royal Casino</span>
-                    </a>
-                    <a href="/Common/Galaxy.html" class="nav-item">
-                        <i class="fas fa-galaxy"></i>
-                        <span>Galaxy Casino</span>
-                    </a>
-                </div>
+        <!-- CRICKET SECTION -->
+        <div id="cricket-section">
+            <h2 class="section-title">
+                <span class="live-dot"></span>
+                Cricket Matches
+            </h2>
+            <div class="matches-container" id="cricket-matches">
+                <div class="loading"><div class="spinner"></div></div>
             </div>
+        </div>
 
-            <div class="nav-section">
-                <h3 class="nav-section-title">Account</h3>
-                <div class="nav-items">
-                    <a href="/Customer/Liable" class="nav-item">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Current Position</span>
-                    </a>
-                    <a href="/Customer/Ledger/" class="nav-item">
-                        <i class="fas fa-receipt"></i>
-                        <span>Statement</span>
-                    </a>
-                    <a href="/Customer/Bets" class="nav-item">
-                        <i class="fas fa-history"></i>
-                        <span>Bet History</span>
-                    </a>
-                </div>
+        <!-- FOOTBALL SECTION -->
+        <div id="football-section" class="hidden">
+            <h2 class="section-title">
+                <span class="live-dot"></span>
+                Football Matches
+            </h2>
+            <div class="matches-container" id="football-matches">
+                <div class="loading"><div class="spinner"></div></div>
             </div>
-        </aside>
+        </div>
 
-        <!-- MAIN CONTENT -->
-        <main class="content-area">
-            <!-- FEATURED BANNER -->
-            <div class="featured-banner">
-                <div class="featured-content">
-                    <h1 class="featured-title">Welcome to BetPro Exchange</h1>
-                    <p class="featured-subtitle">Experience the best odds and live betting across all major sports</p>
-                    <div class="featured-actions">
-                        <a href="/Common/BetProGames?GameId=9022" class="btn btn-primary">
-                            <i class="fas fa-plane-departure"></i>
-                            Play Aviator
-                        </a>
-                        <a href="/Common/Sap.html" class="btn btn-outline">
-                            <i class="fas fa-book"></i>
-                            Sports Book
-                        </a>
-                    </div>
-                </div>
+        <!-- TENNIS SECTION -->
+        <div id="tennis-section" class="hidden">
+            <h2 class="section-title">
+                <span class="live-dot"></span>
+                Tennis Matches
+            </h2>
+            <div class="matches-container" id="tennis-matches">
+                <div class="loading"><div class="spinner"></div></div>
             </div>
+        </div>
 
-            <!-- STATS ROW -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <span class="stat-label">Total In-Play</span>
-                    <span class="stat-value" id="totalInPlayCount">0</span>
-                    <span class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i> Live now
-                    </span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-label">Your Balance</span>
-                    <span class="stat-value user-balance">-</span>
-                    <span class="stat-change">
-                        Available to bet
-                    </span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-label">Active Bets</span>
-                    <span class="stat-value user-bets">0</span>
-                    <span class="stat-change">
-                        Currently running
-                    </span>
-                </div>
+        <!-- HORSE RACING -->
+        <div id="horse-section" class="hidden">
+            <h2 class="section-title">
+                <i class="fas fa-flag-checkered"></i>
+                Horse Racing
+            </h2>
+            <div class="race-list" id="horse-races">
+                <div class="loading"><div class="spinner"></div></div>
             </div>
+        </div>
 
-            <!-- CASINO GAMES -->
-            <div class="games-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-fire"></i>
-                        Featured Games
-                    </h2>
-                    <a href="/Common/Games.html" class="quick-link">View All <i class="fas fa-arrow-right"></i></a>
-                </div>
-                <div class="games-slider" id="casino-games">
-                    <!-- Games will be populated here -->
-                </div>
+        <!-- GREYHOUND -->
+        <div id="greyhound-section" class="hidden">
+            <h2 class="section-title">
+                <i class="fas fa-flag-checkered"></i>
+                Greyhound Racing
+            </h2>
+            <div class="race-list" id="greyhound-races">
+                <div class="loading"><div class="spinner"></div></div>
             </div>
+        </div>
 
-            <!-- LIVE CRICKET MATCHES -->
-            <div id="cricket-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="live-indicator"></span>
-                        Cricket Matches
-                    </h2>
-                    <div class="section-nav">
-                        <button class="section-nav-btn active" onclick="switchTab('cricket', 'live')">Live</button>
-                        <button class="section-nav-btn" onclick="switchTab('cricket', 'upcoming')">Upcoming</button>
-                    </div>
-                </div>
-                <div class="matches-grid" id="cricket-matches">
-                    <!-- Matches will be populated here -->
-                </div>
-            </div>
-
-            <!-- LIVE FOOTBALL MATCHES -->
-            <div id="football-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="live-indicator"></span>
-                        Football Matches
-                    </h2>
-                    <div class="section-nav">
-                        <button class="section-nav-btn active" onclick="switchTab('football', 'live')">Live</button>
-                        <button class="section-nav-btn" onclick="switchTab('football', 'upcoming')">Upcoming</button>
-                    </div>
-                </div>
-                <div class="matches-grid" id="football-matches">
-                    <!-- Matches will be populated here -->
-                </div>
-            </div>
-
-            <!-- LIVE TENNIS MATCHES -->
-            <div id="tennis-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="live-indicator"></span>
-                        Tennis Matches
-                    </h2>
-                    <div class="section-nav">
-                        <button class="section-nav-btn active" onclick="switchTab('tennis', 'live')">Live</button>
-                        <button class="section-nav-btn" onclick="switchTab('tennis', 'upcoming')">Upcoming</button>
-                    </div>
-                </div>
-                <div class="matches-grid" id="tennis-matches">
-                    <!-- Matches will be populated here -->
-                </div>
-            </div>
-
-            <!-- RACING SECTION -->
-            <div class="race-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-flag-checkered"></i>
-                        Racing
-                    </h2>
-                </div>
-                <div class="race-tabs">
-                    <button class="race-tab active" onclick="switchRaceTab('horse')">Horse Racing</button>
-                    <button class="race-tab" onclick="switchRaceTab('greyhound')">Greyhound</button>
-                </div>
-                <div class="race-items" id="horse-races">
-                    <!-- Horse races will be populated here -->
-                </div>
-                <div class="race-items hidden" id="greyhound-races">
-                    <!-- Greyhound races will be populated here -->
-                </div>
-            </div>
-        </main>
+        <!-- CASINO SECTION -->
+        <div id="casino-section" class="hidden">
+            <h2 class="section-title">
+                <i class="fas fa-fire"></i>
+                Featured Casino Games
+            </h2>
+            <div class="casino-grid" id="casino-games"></div>
+        </div>
     </div>
 
     <!-- FOOTER -->
@@ -1152,15 +1211,16 @@
                 <a href="#" onclick="showMarketRules(); return false;" class="footer-link">Market Rules</a>
                 <a href="#" onclick="showTos(); return false;" class="footer-link">Terms & Conditions</a>
                 <a href="/Common/Result" class="footer-link">Results</a>
-                <a href="/Customer/Profile" class="footer-link">Profile</a>
+                <a href="/Customer/Profile" class="footer-link">My Profile</a>
+                <a href="/Customer/Liable" class="footer-link">Current Position</a>
             </div>
-            <p class="footer-text">© 2024 BetPro. All rights reserved. | 18+ Only | Gamble Responsibly</p>
+            <p class="footer-text">© 2024 BetPro Exchange. All rights reserved. | 18+ Only | Gamble Responsibly</p>
         </div>
     </footer>
 
-    <!-- MODALS (keeping existing modal structure) -->
-    <div class="modal fade" id="modalMarketRules" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
+    <!-- MODALS -->
+    <div class="modal fade" id="modalMarketRules" tabindex="-1">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Market Rules</h5>
@@ -1171,8 +1231,8 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalTos" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="modalTos" tabindex="-1">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Terms and Conditions</h5>
@@ -1185,14 +1245,14 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
+
     <script>
-        // API CONFIGURATION (unchanged)
         const API_BASE = 'https://bettingbackending.work.gd/api';
+        let currentSport = 'cricket';
 
         // UTILITY FUNCTIONS
         function formatCurrency(value) {
-            return Math.floor(value || 0);
+            return Math.floor(value || 0).toLocaleString();
         }
 
         function formatTime(dateString) {
@@ -1220,29 +1280,18 @@
                 if (data.success && data.user) {
                     const user = data.user;
                     
-                    // Update navbar
-                    const userBtn = document.getElementById('navbar-user');
-                    if (userBtn) {
-                        userBtn.innerHTML = `
-                            <div class="user-avatar">${user.username.charAt(0).toUpperCase()}</div>
-                            <span>${user.username}</span>
-                            <i class="fas fa-caret-down"></i>
-                        `;
-                    }
+                    document.getElementById('username-display').textContent = user.username;
+                    document.querySelector('.user-avatar').textContent = user.username.charAt(0).toUpperCase();
 
-                    // Update wallet displays
-                    const balanceEls = document.querySelectorAll('.user-balance');
-                    balanceEls.forEach(el => {
+                    document.querySelectorAll('.user-balance').forEach(el => {
                         el.textContent = formatCurrency(user.wallet_balance);
                     });
 
-                    const liableEls = document.querySelectorAll('.user-liable');
-                    liableEls.forEach(el => {
-                        el.textContent = `-${formatCurrency(user.liable)}`;
+                    document.querySelectorAll('.user-liable').forEach(el => {
+                        el.textContent = '-' + formatCurrency(user.liable);
                     });
 
-                    const betsEls = document.querySelectorAll('.user-bets');
-                    betsEls.forEach(el => {
+                    document.querySelectorAll('.user-bets').forEach(el => {
                         el.textContent = user.active_bets || 0;
                     });
                 }
@@ -1251,7 +1300,7 @@
             }
         }
 
-        // MATCH RENDERING
+        // MATCH CARD RENDERING
         function createMatchCard(match, isInPlay = false) {
             const time = formatTime(match.startTime);
             const status = isInPlay ? 'live' : 'upcoming';
@@ -1259,60 +1308,63 @@
             return `
                 <div class="match-card" onclick="window.location.href='/Common/Market.html?id=${match.marketId}'">
                     <div class="match-header">
-                        <div class="match-time">
-                            <i class="far fa-clock"></i>
-                            <span>${time}</span>
+                        <div class="match-time-info">
+                            <div class="match-time">
+                                <i class="far fa-clock"></i>
+                                ${time}
+                            </div>
                         </div>
                         <span class="match-status ${status}">${status}</span>
                     </div>
-                    <div class="match-teams">
-                        <div class="match-name">${match.match}</div>
-                        <div class="match-info">
-                            <span class="match-info-item">
-                                <i class="fas fa-chart-bar"></i>
-                                ${match.totalMatched || '0'}
-                            </span>
+                    
+                    <div class="match-name">${match.match}</div>
+                    
+                    <div class="match-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>${match.totalMatched || '0'}</span>
                         </div>
                     </div>
-                    <div class="odds-grid">
-                        <div class="odds-box">
-                            <div class="odds-label">Team 1</div>
-                            <div class="odds-values">
-                                <div class="odds-value back">
-                                    <span class="odds-price">${match.odds.back1.price}</span>
-                                    <span class="odds-size">${match.odds.back1.size}</span>
+                    
+                    <div class="odds-container">
+                        <div class="odds-team">
+                            <div class="odds-team-name">Team 1</div>
+                            <div class="odds-row">
+                                <div class="odd-box back">
+                                    <div class="odd-price">${match.odds.back1.price}</div>
+                                    <div class="odd-size">${match.odds.back1.size}</div>
                                 </div>
-                                <div class="odds-value lay">
-                                    <span class="odds-price">${match.odds.lay1.price}</span>
-                                    <span class="odds-size">${match.odds.lay1.size}</span>
+                                <div class="odd-box lay">
+                                    <div class="odd-price">${match.odds.lay1.price}</div>
+                                    <div class="odd-size">${match.odds.lay1.size}</div>
                                 </div>
                             </div>
                         </div>
                         ${match.odds.backX && match.odds.backX.price !== 'x' ? `
-                        <div class="odds-box">
-                            <div class="odds-label">Draw</div>
-                            <div class="odds-values">
-                                <div class="odds-value back">
-                                    <span class="odds-price">${match.odds.backX.price}</span>
-                                    <span class="odds-size">${match.odds.backX.size}</span>
+                        <div class="odds-team">
+                            <div class="odds-team-name">Draw</div>
+                            <div class="odds-row">
+                                <div class="odd-box back">
+                                    <div class="odd-price">${match.odds.backX.price}</div>
+                                    <div class="odd-size">${match.odds.backX.size}</div>
                                 </div>
-                                <div class="odds-value lay">
-                                    <span class="odds-price">${match.odds.layX.price}</span>
-                                    <span class="odds-size">${match.odds.layX.size}</span>
+                                <div class="odd-box lay">
+                                    <div class="odd-price">${match.odds.layX.price}</div>
+                                    <div class="odd-size">${match.odds.layX.size}</div>
                                 </div>
                             </div>
                         </div>
                         ` : ''}
-                        <div class="odds-box">
-                            <div class="odds-label">Team 2</div>
-                            <div class="odds-values">
-                                <div class="odds-value back">
-                                    <span class="odds-price">${match.odds.back2.price}</span>
-                                    <span class="odds-size">${match.odds.back2.size}</span>
+                        <div class="odds-team">
+                            <div class="odds-team-name">Team 2</div>
+                            <div class="odds-row">
+                                <div class="odd-box back">
+                                    <div class="odd-price">${match.odds.back2.price}</div>
+                                    <div class="odd-size">${match.odds.back2.size}</div>
                                 </div>
-                                <div class="odds-value lay">
-                                    <span class="odds-price">${match.odds.lay2.price}</span>
-                                    <span class="odds-size">${match.odds.lay2.size}</span>
+                                <div class="odd-box lay">
+                                    <div class="odd-price">${match.odds.lay2.price}</div>
+                                    <div class="odd-size">${match.odds.lay2.size}</div>
                                 </div>
                             </div>
                         </div>
@@ -1321,8 +1373,8 @@
             `;
         }
 
-        // LOAD CRICKET MATCHES
-        async function loadCricketMatches() {
+        // LOAD CRICKET
+        async function loadCricket() {
             try {
                 const [liveRes, inplayRes] = await Promise.all([
                     fetch(`${API_BASE}/markets/live/cricket`),
@@ -1335,33 +1387,31 @@
                 const container = document.getElementById('cricket-matches');
                 let html = '';
                 
-                // In-play matches
                 if (inplayData.success && inplayData.markets?.length > 0) {
                     inplayData.markets.forEach(match => {
                         html += createMatchCard(match, true);
                     });
                 }
                 
-                // Live/upcoming matches
                 if (liveData.status === 'success' && liveData.data?.length > 0) {
                     liveData.data.forEach(match => {
                         html += createMatchCard(match, false);
                     });
                 }
                 
-                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:2rem;">No cricket matches available</p>';
+                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:3rem;">No cricket matches available right now</p>';
                 
-                // Update counts
                 const count = (inplayData.markets?.length || 0) + (liveData.data?.length || 0);
-                document.getElementById('cricketMatchCount').textContent = count;
-                updateTotalInPlayCount();
+                document.getElementById('cricketBadge').textContent = count;
+                updateTotalCount();
             } catch (err) {
-                console.error('Error loading cricket:', err);
+                console.error('Error:', err);
+                document.getElementById('cricket-matches').innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:3rem;">Failed to load matches</p>';
             }
         }
 
-        // LOAD FOOTBALL MATCHES
-        async function loadFootballMatches() {
+        // LOAD FOOTBALL
+        async function loadFootball() {
             try {
                 const [liveRes, inplayRes] = await Promise.all([
                     fetch(`${API_BASE}/markets/live/football`),
@@ -1386,18 +1436,18 @@
                     });
                 }
                 
-                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:2rem;">No football matches available</p>';
+                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:3rem;">No football matches available</p>';
                 
                 const count = (inplayData.markets?.length || 0) + (liveData.data?.length || 0);
-                document.getElementById('footballMatchCount').textContent = count;
-                updateTotalInPlayCount();
+                document.getElementById('footballBadge').textContent = count;
+                updateTotalCount();
             } catch (err) {
-                console.error('Error loading football:', err);
+                console.error('Error:', err);
             }
         }
 
-        // LOAD TENNIS MATCHES
-        async function loadTennisMatches() {
+        // LOAD TENNIS
+        async function loadTennis() {
             try {
                 const [liveRes, inplayRes] = await Promise.all([
                     fetch(`${API_BASE}/markets/live/tennis`),
@@ -1422,18 +1472,18 @@
                     });
                 }
                 
-                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:2rem;">No tennis matches available</p>';
+                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:3rem;">No tennis matches available</p>';
                 
                 const count = (inplayData.markets?.length || 0) + (liveData.data?.length || 0);
-                document.getElementById('tennisMatchCount').textContent = count;
-                updateTotalInPlayCount();
+                document.getElementById('tennisBadge').textContent = count;
+                updateTotalCount();
             } catch (err) {
-                console.error('Error loading tennis:', err);
+                console.error('Error:', err);
             }
         }
 
-        // LOAD RACING
-        async function loadHorseRaces() {
+        // LOAD HORSE RACING
+        async function loadHorseRacing() {
             try {
                 const res = await fetch(`${API_BASE}/markets/live/horse`);
                 const data = await res.json();
@@ -1445,24 +1495,25 @@
                     data.data.forEach(race => {
                         const time = formatTime(race.startTime);
                         html += `
-                            <div class="race-item" onclick="window.location.href='/Common/Market.html?id=${race.marketId}'">
-                                <div class="race-details">
-                                    <span class="race-time">${time}</span>
-                                    <span class="race-venue">${race.match}</span>
+                            <div class="race-card" onclick="window.location.href='/Common/Market.html?id=${race.marketId}'">
+                                <div class="race-info">
+                                    <div class="race-time">${time}</div>
+                                    <div class="race-name">${race.match}</div>
                                 </div>
-                                <i class="fas fa-chevron-right race-action"></i>
+                                <i class="fas fa-chevron-right race-arrow"></i>
                             </div>
                         `;
                     });
                 }
                 
-                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:1rem;">No horse races available</p>';
+                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:2rem;">No races available</p>';
             } catch (err) {
-                console.error('Error loading horse races:', err);
+                console.error('Error:', err);
             }
         }
 
-        async function loadGreyhoundRaces() {
+        // LOAD GREYHOUND
+        async function loadGreyhound() {
             try {
                 const res = await fetch(`${API_BASE}/markets/live/greyhound`);
                 const data = await res.json();
@@ -1474,25 +1525,25 @@
                     data.data.forEach(race => {
                         const time = formatTime(race.startTime);
                         html += `
-                            <div class="race-item" onclick="window.location.href='/Common/Market.html?id=${race.marketId}'">
-                                <div class="race-details">
-                                    <span class="race-time">${time}</span>
-                                    <span class="race-venue">${race.match}</span>
+                            <div class="race-card" onclick="window.location.href='/Common/Market.html?id=${race.marketId}'">
+                                <div class="race-info">
+                                    <div class="race-time">${time}</div>
+                                    <div class="race-name">${race.match}</div>
                                 </div>
-                                <i class="fas fa-chevron-right race-action"></i>
+                                <i class="fas fa-chevron-right race-arrow"></i>
                             </div>
                         `;
                     });
                 }
                 
-                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:1rem;">No greyhound races available</p>';
+                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:2rem;">No races available</p>';
             } catch (err) {
-                console.error('Error loading greyhound races:', err);
+                console.error('Error:', err);
             }
         }
 
-        // CASINO GAMES
-        function loadCasinoGames() {
+        // LOAD CASINO
+        function loadCasino() {
             const games = [
                 { name: 'Aviator', img: '/img/casino/Aviator.png', url: '/Common/BetProGames?GameId=9022' },
                 { name: 'Sportsbook', img: '/img/casino/sportsbook.jpeg', url: '/Common/Sap.html' },
@@ -1506,86 +1557,73 @@
             
             const container = document.getElementById('casino-games');
             container.innerHTML = games.map(game => `
-                <a href="${game.url}" class="game-card">
-                    <img src="${game.img}" alt="${game.name}" onerror="this.src='/img/v2/placeholder.png'">
-                    <div class="game-overlay">
-                        <div class="game-title">${game.name}</div>
+                <a href="${game.url}" class="casino-card">
+                    <img src="${game.img}" alt="${game.name}" onerror="this.src='/img/favicon/BetPro.ico'">
+                    <div class="casino-overlay">
+                        <div class="casino-name">${game.name}</div>
                     </div>
                 </a>
             `).join('');
         }
 
-        // UTILITY FUNCTIONS
-        function updateTotalInPlayCount() {
-            const cricket = parseInt(document.getElementById('cricketMatchCount').textContent || 0);
-            const football = parseInt(document.getElementById('footballMatchCount').textContent || 0);
-            const tennis = parseInt(document.getElementById('tennisMatchCount').textContent || 0);
-            document.getElementById('totalInPlayCount').textContent = cricket + football + tennis;
-        }
-
-        function switchTab(sport, type) {
-            // Implementation for switching between live/upcoming
-            console.log(`Switching ${sport} to ${type}`);
-        }
-
-        function switchRaceTab(type) {
-            const tabs = document.querySelectorAll('.race-tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
+        // SWITCH SPORTS
+        function switchSport(sport) {
+            currentSport = sport;
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-            if (type === 'horse') {
-                document.getElementById('horse-races').classList.remove('hidden');
-                document.getElementById('greyhound-races').classList.add('hidden');
-            } else {
-                document.getElementById('horse-races').classList.add('hidden');
-                document.getElementById('greyhound-races').classList.remove('hidden');
+            document.querySelectorAll('[id$="-section"]').forEach(section => section.classList.add('hidden'));
+            document.getElementById(`${sport}-section`).classList.remove('hidden');
+            
+            if (sport === 'horse') loadHorseRacing();
+            if (sport === 'greyhound') loadGreyhound();
+            if (sport === 'casino') loadCasino();
+        }
+
+        // UPDATE COUNTS
+        function updateTotalCount() {
+            const cricket = parseInt(document.getElementById('cricketBadge').textContent || 0);
+            const football = parseInt(document.getElementById('footballBadge').textContent || 0);
+            const tennis = parseInt(document.getElementById('tennisBadge').textContent || 0);
+            document.getElementById('totalInPlayCount').textContent = cricket + football + tennis;
+            document.getElementById('todayMatches').textContent = cricket + football + tennis;
+        }
+
+        // TOGGLE DROPDOWN
+        function toggleDropdown() {
+            document.getElementById('user-dropdown').classList.toggle('active');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-profile')) {
+                document.getElementById('user-dropdown').classList.remove('active');
             }
-        }
+        });
 
-        function toggleUserMenu() {
-            const dropdown = document.getElementById('user-dropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
+        // MODALS
         function showMarketRules() {
             $('#modalMarketRules').modal('show');
-            $.get('/rules.html', function(data) {
-                $('#modalMarketRules .modal-body').html(data);
-            });
+            $.get('/rules.html', data => $('#modalMarketRules .modal-body').html(data));
         }
 
         function showTos() {
             $('#modalTos').modal('show');
-            $.get('/tos.html', function(data) {
-                $('#modalTos .modal-body').html(data);
-            });
+            $.get('/tos.html', data => $('#modalTos .modal-body').html(data));
         }
 
         // INITIALIZE
         document.addEventListener('DOMContentLoaded', () => {
             loadUserData();
-            loadCricketMatches();
-            loadFootballMatches();
-            loadTennisMatches();
-            loadHorseRaces();
-            loadGreyhoundRaces();
-            loadCasinoGames();
+            loadCricket();
+            loadFootball();
+            loadTennis();
             
-            // Auto-refresh every 30 seconds
             setInterval(() => {
-                loadCricketMatches();
-                loadFootballMatches();
-                loadTennisMatches();
-                loadHorseRaces();
-                loadGreyhoundRaces();
+                if (currentSport === 'cricket') loadCricket();
+                if (currentSport === 'football') loadFootball();
+                if (currentSport === 'tennis') loadTennis();
             }, 30000);
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.user-menu')) {
-                document.getElementById('user-dropdown')?.classList.add('hidden');
-            }
         });
     </script>
 </body>
