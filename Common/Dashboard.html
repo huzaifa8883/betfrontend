@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Sports Trading Platform">
     <link rel="shortcut icon" href="/img/favicon/BetPro.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Barlow:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <title>BetPro Exchange - Live Sports Betting</title>
     
@@ -17,305 +17,362 @@
         }
 
         :root {
-            --bg-primary: #0D0D2B;
-            --bg-secondary: #161637;
-            --bg-card: #1E1E3F;
-            --accent-1: #FF006E;
-            --accent-2: #8338EC;
-            --accent-3: #3A86FF;
-            --accent-4: #06FFA5;
-            --success: #00FF88;
-            --danger: #FF3B69;
-            --warning: #FFBE0B;
-            --text-primary: #FFFFFF;
-            --text-secondary: #B4B4C8;
-            --text-muted: #6E6E8F;
-            --border: rgba(255, 255, 255, 0.08);
-            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
-            --shadow-md: 0 8px 24px rgba(0,0,0,0.2);
-            --shadow-lg: 0 16px 48px rgba(0,0,0,0.3);
-            --shadow-glow: 0 0 30px rgba(102, 126, 234, 0.3);
+            --primary-color: #ff0046;
+            --secondary-color: #0d0d2b;
+            --dark-bg: #0a0a1f;
+            --card-bg: #15152e;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #a8a8b3;
+            --success: #00ff88;
+            --danger: #ff0046;
+            --warning: #ffa800;
+            --gradient-primary: linear-gradient(135deg, #ff0046 0%, #ff6b9d 100%);
+            --gradient-secondary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg-primary);
+            font-family: 'Barlow', sans-serif;
+            background: var(--dark-bg);
             color: var(--text-primary);
             line-height: 1.6;
             overflow-x: hidden;
-            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
         }
 
         /* ANIMATED BACKGROUND */
-        .bg-animation {
+        .bg-pattern {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 0.3;
-            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(131, 56, 236, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 20%, rgba(58, 134, 255, 0.1) 0%, transparent 50%);
-            animation: bgMove 20s ease infinite;
+            opacity: 0.05;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.02) 35px, rgba(255,255,255,.02) 70px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255,255,255,.02) 35px, rgba(255,255,255,.02) 70px);
         }
 
-        @keyframes bgMove {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.1) rotate(5deg); }
-        }
-
-        /* TOP NAVIGATION */
-        .top-nav {
+        /* TOP HEADER */
+        .top-header {
+            background: rgba(13, 13, 43, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
-            background: rgba(13, 13, 43, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        .nav-container {
+        .top-header-content {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 1rem 1.5rem;
+            padding: 0 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 2rem;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
         .logo {
-            font-size: 1.75rem;
-            font-weight: 900;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--text-primary);
             text-decoration: none;
-            letter-spacing: -1px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            position: relative;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 60%;
+            height: 3px;
+            background: var(--gradient-primary);
         }
 
         .logo i {
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary-color);
         }
 
-        .nav-links {
+        .header-search {
+            position: relative;
+            width: 350px;
+        }
+
+        .header-search input {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 0.65rem 1rem 0.65rem 2.75rem;
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .header-search input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .header-search i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .wallet-display {
             display: flex;
             gap: 1.5rem;
             align-items: center;
         }
 
-        .nav-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            position: relative;
-            padding: 0.5rem 0;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gradient-1);
-            transition: width 0.3s;
-        }
-
-        .nav-link:hover {
-            color: var(--text-primary);
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .wallet-info {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            background: var(--bg-card);
-            padding: 0.75rem 1.25rem;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-        }
-
         .wallet-item {
             display: flex;
             flex-direction: column;
-            gap: 0.125rem;
+            gap: 0.25rem;
         }
 
         .wallet-label {
             font-size: 0.7rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
-        .wallet-amount {
-            font-size: 0.95rem;
+        .wallet-value {
+            font-size: 1.1rem;
             font-weight: 700;
-            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
         }
 
-        .user-profile {
+        .user-menu {
             position: relative;
         }
 
-        .user-btn {
+        .user-trigger {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            background: var(--gradient-1);
-            padding: 0.65rem 1.25rem;
-            border-radius: 50px;
-            border: none;
-            color: white;
-            font-weight: 600;
+            background: var(--card-bg);
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: var(--shadow-glow);
         }
 
-        .user-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 40px rgba(102, 126, 234, 0.5);
+        .user-trigger:hover {
+            border-color: var(--primary-color);
         }
 
         .user-avatar {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            background: var(--gradient-primary);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
+            font-size: 0.9rem;
         }
 
-        .dropdown {
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .dropdown-menu {
             position: absolute;
             top: calc(100% + 0.5rem);
             right: 0;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            min-width: 200px;
-            box-shadow: var(--shadow-lg);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            min-width: 220px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s;
         }
 
-        .dropdown.active {
+        .dropdown-menu.active {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
 
-        .dropdown-item {
-            display: block;
-            padding: 0.75rem 1.25rem;
+        .dropdown-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1.25rem;
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.9rem;
             transition: all 0.2s;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .dropdown-item:last-child {
+        .dropdown-link:last-child {
             border-bottom: none;
         }
 
-        .dropdown-item:hover {
-            background: rgba(255,255,255,0.05);
+        .dropdown-link:hover {
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
             padding-left: 1.5rem;
         }
 
-        .mobile-menu-btn {
-            display: none;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-size: 1.25rem;
-            cursor: pointer;
+        .dropdown-link i {
+            width: 18px;
+            color: var(--primary-color);
         }
 
-        /* MAIN CONTAINER */
-        .main-wrapper {
-            position: relative;
-            z-index: 1;
+        /* MAIN NAVIGATION */
+        .main-nav {
+            background: var(--secondary-color);
+            border-bottom: 2px solid var(--primary-color);
+            position: sticky;
+            top: 70px;
+            z-index: 999;
+        }
+
+        .nav-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 1.5rem;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* HERO SECTION */
-        .hero-section {
-            background: var(--gradient-1);
-            border-radius: 24px;
-            padding: 3rem;
-            margin-bottom: 2rem;
+        .nav-links {
+            display: flex;
+            gap: 0;
+        }
+
+        .nav-link {
+            padding: 1rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            font-family: 'Rajdhani', sans-serif;
         }
 
-        .hero-section::before {
+        .nav-link::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: heroFloat 8s ease-in-out infinite;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s;
         }
 
-        @keyframes heroFloat {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-30px, -30px); }
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text-primary);
+        }
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            transform: scaleX(1);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* HERO BANNER */
+        .hero-banner {
+            position: relative;
+            background: linear-gradient(135deg, #0d0d2b 0%, #1a1a3e 100%);
+            margin: 2rem 0;
+            padding: 4rem 0;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ff0046" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,165.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+            opacity: 0.3;
         }
 
         .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
             position: relative;
             z-index: 1;
         }
 
         .hero-title {
-            font-size: 2.5rem;
-            font-weight: 900;
-            margin-bottom: 0.75rem;
-            line-height: 1.2;
+            font-size: 3.5rem;
+            font-weight: 800;
+            font-family: 'Rajdhani', sans-serif;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .hero-title span {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .hero-subtitle {
-            font-size: 1.15rem;
-            opacity: 0.95;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
             margin-bottom: 2rem;
             max-width: 600px;
         }
@@ -326,245 +383,286 @@
             flex-wrap: wrap;
         }
 
-        .btn {
-            padding: 0.85rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.95rem 2.5rem;
+            border: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 0.95rem;
-            white-space: nowrap;
+            gap: 0.75rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
         }
 
-        .btn-white {
-            background: white;
-            color: var(--accent-2);
-        }
-
-        .btn-white:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(255,255,255,0.3);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: white;
-            border: 2px solid rgba(255,255,255,0.5);
-        }
-
-        .btn-outline:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: white;
-        }
-
-        /* STATS SECTION */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1.75rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-
-        .stat-card::before {
+        .btn-primary::before {
             content: '';
             position: absolute;
             top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-1);
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
         }
 
-        .stat-card:nth-child(2)::before {
-            background: var(--gradient-3);
+        .btn-primary:hover::before {
+            left: 100%;
         }
 
-        .stat-card:nth-child(3)::before {
-            background: var(--gradient-4);
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 0, 70, 0.4);
         }
 
-        .stat-card:nth-child(4)::before {
-            background: var(--gradient-2);
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            padding: 0.95rem 2.5rem;
+            border: 2px solid var(--primary-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-md);
-            border-color: rgba(255,255,255,0.2);
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        /* STATS BAR */
+        .stats-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            margin: 2rem 0;
+        }
+
+        .stats-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+        }
+
+        .stat-box {
+            padding: 1.75rem 1.5rem;
+            text-align: center;
+            border-right: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .stat-box:last-child {
+            border-right: none;
+        }
+
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-primary);
         }
 
         .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            background: rgba(102, 126, 234, 0.1);
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
         }
 
-        .stat-card:nth-child(2) .stat-icon {
-            background: rgba(58, 134, 255, 0.1);
-        }
-
-        .stat-card:nth-child(3) .stat-icon {
-            background: rgba(6, 255, 165, 0.1);
-        }
-
-        .stat-card:nth-child(4) .stat-icon {
-            background: rgba(255, 107, 157, 0.1);
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 800;
+            font-family: 'Rajdhani', sans-serif;
+            margin-bottom: 0.25rem;
         }
 
         .stat-label {
             font-size: 0.85rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 0.5rem;
         }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
+        /* MAIN CONTENT */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            position: relative;
+            z-index: 1;
         }
 
-        .stat-change {
-            font-size: 0.85rem;
-            color: var(--success);
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        /* TABS NAVIGATION */
-        .tabs-nav {
-            display: flex;
-            gap: 0.5rem;
+        /* SECTION HEADER */
+        .section-header {
             margin-bottom: 2rem;
-            background: var(--bg-card);
-            padding: 0.5rem;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-
-        .tabs-nav::-webkit-scrollbar {
-            display: none;
-        }
-
-        .tab-btn {
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
             position: relative;
         }
 
-        .tab-btn.active {
-            background: var(--gradient-1);
-            color: white;
-            box-shadow: var(--shadow-glow);
+        .section-header::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 150px;
+            height: 2px;
+            background: var(--primary-color);
         }
 
-        .tab-btn:not(.active):hover {
-            background: rgba(255,255,255,0.05);
-            color: var(--text-primary);
-        }
-
-        .tab-badge {
-            background: var(--danger);
-            color: white;
-            padding: 0.125rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            margin-left: 0.5rem;
-        }
-
-        /* MATCH CARDS */
         .section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-family: 'Rajdhani', sans-serif;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 1rem;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 0, 70, 0.15);
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .live-dot {
-            width: 10px;
-            height: 10px;
-            background: var(--danger);
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
             border-radius: 50%;
             animation: livePulse 2s infinite;
         }
 
         @keyframes livePulse {
-            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 59, 105, 0.7); }
-            50% { opacity: 0.7; box-shadow: 0 0 0 10px rgba(255, 59, 105, 0); }
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 0, 70, 0.7); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(255, 0, 70, 0); }
         }
 
-        .matches-container {
+        /* SPORT TABS */
+        .sport-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .sport-tab {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            padding: 0.85rem 1.75rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Rajdhani', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sport-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: left 0.3s;
+            z-index: 0;
+        }
+
+        .sport-tab.active::before {
+            left: 0;
+        }
+
+        .sport-tab.active {
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .sport-tab span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .sport-tab i {
+            position: relative;
+            z-index: 1;
+            font-size: 1.25rem;
+        }
+
+        .tab-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.15rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sport-tab.active .tab-badge {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* MATCH CARDS */
+        .matches-grid {
             display: grid;
             gap: 1.5rem;
             margin-bottom: 3rem;
         }
 
         .match-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid transparent;
             padding: 1.75rem;
             transition: all 0.3s;
             cursor: pointer;
             position: relative;
-            overflow: hidden;
-        }
-
-        .match-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient-3);
-            transform: scaleX(0);
-            transition: transform 0.3s;
-        }
-
-        .match-card:hover::before {
-            transform: scaleX(1);
         }
 
         .match-card:hover {
-            border-color: rgba(255,255,255,0.2);
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-md);
+            border-left-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateX(5px);
         }
 
         .match-header {
@@ -572,62 +670,65 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.25rem;
-        }
-
-        .match-time-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .match-time {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .match-time i {
+            color: var(--primary-color);
         }
 
         .match-status {
-            padding: 0.35rem 0.85rem;
+            padding: 0.4rem 1rem;
             border-radius: 20px;
             font-size: 0.75rem;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            font-family: 'Rajdhani', sans-serif;
         }
 
         .match-status.live {
-            background: linear-gradient(135deg, #FF006E 0%, #FF3B69 100%);
+            background: var(--gradient-primary);
             color: white;
-            animation: statusGlow 2s infinite;
+            animation: statusPulse 2s infinite;
         }
 
-        @keyframes statusGlow {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 110, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(255, 0, 110, 0.8); }
+        @keyframes statusPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 70, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 0, 70, 0.8); }
         }
 
         .match-status.upcoming {
-            background: rgba(6, 255, 165, 0.15);
-            color: var(--accent-4);
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--success);
+            border: 1px solid var(--success);
         }
 
         .match-name {
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             font-weight: 700;
-            margin-bottom: 0.75rem;
-            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-family: 'Rajdhani', sans-serif;
         }
 
-        .match-meta {
+        .match-info {
             display: flex;
-            gap: 1.5rem;
+            gap: 2rem;
             margin-bottom: 1.5rem;
             flex-wrap: wrap;
         }
 
-        .meta-item {
+        .info-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -635,202 +736,242 @@
             font-size: 0.9rem;
         }
 
-        .meta-item i {
-            color: var(--accent-3);
+        .info-item i {
+            color: var(--primary-color);
         }
 
-        /* ODDS SECTION */
-        .odds-container {
+        /* ODDS GRID */
+        .odds-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
         }
 
         .odds-team {
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
             padding: 1rem;
-            border: 1px solid var(--border);
         }
 
         .odds-team-name {
             font-size: 0.8rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             margin-bottom: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
+            font-family: 'Rajdhani', sans-serif;
         }
 
-        .odds-row {
+        .odds-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.5rem;
         }
 
-        .odd-box {
-            border-radius: 8px;
-            padding: 0.65rem;
+        .odd-btn {
+            padding: 0.75rem;
             text-align: center;
-            transition: all 0.3s;
             border: 1px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
-        .odd-box.back {
-            background: linear-gradient(135deg, rgba(74, 144, 226, 0.15) 0%, rgba(74, 144, 226, 0.05) 100%);
+        .odd-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: left 0.3s;
+        }
+
+        .odd-btn:hover::before {
+            left: 100%;
+        }
+
+        .odd-btn.back {
+            background: rgba(74, 144, 226, 0.15);
             border-color: rgba(74, 144, 226, 0.3);
         }
 
-        .odd-box.back:hover {
-            background: linear-gradient(135deg, rgba(74, 144, 226, 0.25) 0%, rgba(74, 144, 226, 0.15) 100%);
+        .odd-btn.back:hover {
+            background: rgba(74, 144, 226, 0.25);
             transform: translateY(-2px);
         }
 
-        .odd-box.lay {
-            background: linear-gradient(135deg, rgba(255, 107, 157, 0.15) 0%, rgba(255, 107, 157, 0.05) 100%);
+        .odd-btn.lay {
+            background: rgba(255, 107, 157, 0.15);
             border-color: rgba(255, 107, 157, 0.3);
         }
 
-        .odd-box.lay:hover {
-            background: linear-gradient(135deg, rgba(255, 107, 157, 0.25) 0%, rgba(255, 107, 157, 0.15) 100%);
+        .odd-btn.lay:hover {
+            background: rgba(255, 107, 157, 0.25);
             transform: translateY(-2px);
         }
 
         .odd-price {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 800;
             margin-bottom: 0.25rem;
+            font-family: 'Rajdhani', sans-serif;
         }
 
-        .odd-box.back .odd-price {
+        .odd-btn.back .odd-price {
             color: #4A90E2;
         }
 
-        .odd-box.lay .odd-price {
+        .odd-btn.lay .odd-price {
             color: #FF6B9D;
         }
 
         .odd-size {
             font-size: 0.75rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
         }
 
-        /* CASINO SECTION */
+        /* CASINO GRID */
         .casino-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 1.5rem;
             margin-bottom: 3rem;
         }
 
-        .casino-card {
+        .casino-item {
             position: relative;
-            border-radius: 16px;
             overflow: hidden;
+            border: 2px solid var(--border-color);
             aspect-ratio: 3/4;
             cursor: pointer;
             transition: all 0.4s;
-            border: 2px solid transparent;
         }
 
-        .casino-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            border-color: rgba(102, 126, 234, 0.5);
+        .casino-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.9) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1;
         }
 
-        .casino-card img {
+        .casino-item:hover::before {
+            opacity: 1;
+        }
+
+        .casino-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(255, 0, 70, 0.3);
+        }
+
+        .casino-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.4s;
         }
 
-        .casino-card:hover img {
+        .casino-item:hover img {
             transform: scale(1.1);
         }
 
-        .casino-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%);
-            display: flex;
-            align-items: flex-end;
-            padding: 1.25rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .casino-card:hover .casino-overlay {
-            opacity: 1;
-        }
-
         .casino-name {
-            font-weight: 700;
-            font-size: 1rem;
-            color: white;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.25rem;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
         }
 
-        /* RACING SECTION */
+        .casino-item:hover .casino-name {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .casino-name h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .casino-name .btn-primary {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        /* RACE LIST */
         .race-list {
             display: grid;
             gap: 1rem;
             margin-bottom: 3rem;
         }
 
-        .race-card {
+        .race-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid transparent;
             padding: 1.25rem 1.5rem;
-            border-radius: 16px;
             cursor: pointer;
             transition: all 0.3s;
         }
 
-        .race-card:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(102, 126, 234, 0.5);
-            transform: translateX(4px);
+        .race-item:hover {
+            border-left-color: var(--primary-color);
+            transform: translateX(5px);
         }
 
-        .race-info {
+        .race-details {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 2rem;
         }
 
         .race-time {
+            font-size: 1.25rem;
             font-weight: 800;
-            font-size: 1.1rem;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            min-width: 90px;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--primary-color);
+            min-width: 100px;
         }
 
         .race-name {
             font-weight: 600;
-            color: var(--text-primary);
+            font-size: 1.05rem;
         }
 
         .race-arrow {
-            color: var(--text-muted);
-            font-size: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
             transition: all 0.3s;
         }
 
-        .race-card:hover .race-arrow {
-            color: var(--text-primary);
-            transform: translateX(4px);
+        .race-item:hover .race-arrow {
+            color: var(--primary-color);
+            transform: translateX(8px);
         }
 
         /* FOOTER */
         .footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
+            background: var(--secondary-color);
+            border-top: 2px solid var(--primary-color);
             padding: 3rem 1.5rem 2rem;
             margin-top: 4rem;
         }
@@ -852,32 +993,36 @@
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             transition: all 0.3s;
+            font-family: 'Rajdhani', sans-serif;
         }
 
         .footer-link:hover {
-            color: var(--text-primary);
+            color: var(--primary-color);
         }
 
         .footer-text {
             text-align: center;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             font-size: 0.85rem;
         }
 
-        /* LOADING STATE */
+        /* LOADING */
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 3rem;
+            padding: 4rem;
         }
 
         .spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid rgba(255,255,255,0.1);
-            border-top-color: var(--accent-2);
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -886,81 +1031,64 @@
             to { transform: rotate(360deg); }
         }
 
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 992px) {
+        .hidden {
+            display: none !important;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .header-search {
+                width: 250px;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-box {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .stat-box:nth-child(odd) {
+                border-right: 1px solid var(--border-color);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-search,
+            .wallet-display {
+                display: none;
+            }
+
             .nav-links {
                 display: none;
             }
 
-            .mobile-menu-btn {
+            .mobile-toggle {
                 display: block;
             }
 
-            .wallet-info {
-                display: none;
-            }
-
-            .hero-section {
-                padding: 2rem;
-            }
-
             .hero-title {
-                font-size: 1.75rem;
+                font-size: 2.25rem;
             }
 
-            .hero-subtitle {
-                font-size: 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .odds-container {
+            .stats-container {
                 grid-template-columns: 1fr;
             }
 
-            .casino-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            }
-        }
-
-        @media (max-width: 576px) {
-            .nav-container {
-                padding: 0.75rem 1rem;
+            .stat-box {
+                border-right: none;
             }
 
-            .logo {
-                font-size: 1.35rem;
+            .sport-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                scrollbar-width: none;
             }
 
-            .main-wrapper {
-                padding: 1.5rem 1rem;
-            }
-
-            .hero-section {
-                padding: 1.5rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .match-card {
-                padding: 1.25rem;
-            }
-
-            .match-name {
-                font-size: 1.05rem;
-            }
-
-            .tabs-nav {
-                padding: 0.35rem;
-            }
-
-            .tab-btn {
-                padding: 0.6rem 1rem;
-                font-size: 0.85rem;
+            .sport-tabs::-webkit-scrollbar {
+                display: none;
             }
         }
 
@@ -971,224 +1099,253 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
+            background: var(--dark-bg);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--bg-card);
+            background: var(--card-bg);
             border-radius: 5px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-2);
-        }
-
-        .hidden {
-            display: none !important;
+            background: var(--primary-color);
         }
     </style>
 </head>
 <body>
-    <div class="bg-animation"></div>
+    <div class="bg-pattern"></div>
 
-    <!-- TOP NAVIGATION -->
-    <nav class="top-nav">
+    <!-- TOP HEADER -->
+    <header class="top-header">
+        <div class="top-header-content">
+            <div class="header-left">
+                <a href="/Common/Dashboard" class="logo">
+                    <i class="fas fa-bolt"></i>
+                    BetPro
+                </a>
+                <div class="header-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search matches, teams...">
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="wallet-display">
+                    <div class="wallet-item">
+                        <span class="wallet-label">Balance</span>
+                        <span class="wallet-value user-balance">-</span>
+                    </div>
+                    <div class="wallet-item">
+                        <span class="wallet-label">Exposure</span>
+                        <span class="wallet-value user-liable">-</span>
+                    </div>
+                </div>
+
+                <div class="user-menu">
+                    <div class="user-trigger" onclick="toggleUserMenu()">
+                        <div class="user-avatar">U</div>
+                        <span class="user-name" id="username-display">User</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-menu" id="user-dropdown">
+                        <a href="/Customer/Ledger/" class="dropdown-link">
+                            <i class="fas fa-file-invoice"></i>
+                            Statement
+                        </a>
+                        <a href="/Customer/ProfitLoss/" class="dropdown-link">
+                            <i class="fas fa-chart-line"></i>
+                            Profit & Loss
+                        </a>
+                        <a href="/Customer/Bets" class="dropdown-link">
+                            <i class="fas fa-history"></i>
+                            Bet History
+                        </a>
+                        <a href="/Customer/Profile" class="dropdown-link">
+                            <i class="fas fa-user"></i>
+                            Profile
+                        </a>
+                        <a href="/" class="dropdown-link">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN NAVIGATION -->
+    <nav class="main-nav">
         <div class="nav-container">
-            <a href="/Common/Dashboard" class="logo">
-                <i class="fas fa-bolt"></i>
-                BetPro
-            </a>
-
             <div class="nav-links">
-                <a href="/Common/Dashboard" class="nav-link">Dashboard</a>
+                <a href="/Common/Dashboard" class="nav-link active">Dashboard</a>
                 <a href="/Common/Result" class="nav-link">Results</a>
                 <a href="#" class="nav-link" onclick="showMarketRules(); return false;">Rules</a>
             </div>
-
-            <div class="wallet-info">
-                <div class="wallet-item">
-                    <span class="wallet-label">Balance</span>
-                    <span class="wallet-amount user-balance">-</span>
-                </div>
-                <div class="wallet-item">
-                    <span class="wallet-label">Exposure</span>
-                    <span class="wallet-amount user-liable">-</span>
-                </div>
-            </div>
-
-            <div class="user-profile">
-                <button class="user-btn" onclick="toggleDropdown()">
-                    <div class="user-avatar">U</div>
-                    <span id="username-display">User</span>
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="dropdown" id="user-dropdown">
-                    <a href="/Customer/Ledger/" class="dropdown-item">
-                        <i class="fas fa-file-invoice"></i> Statement
-                    </a>
-                    <a href="/Customer/ProfitLoss/" class="dropdown-item">
-                        <i class="fas fa-chart-line"></i> Profit & Loss
-                    </a>
-                    <a href="/Customer/Bets" class="dropdown-item">
-                        <i class="fas fa-history"></i> Bet History
-                    </a>
-                    <a href="/Customer/Profile" class="dropdown-item">
-                        <i class="fas fa-user"></i> Profile
-                    </a>
-                    <a href="/" class="dropdown-item">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                </div>
-            </div>
-
-            <button class="mobile-menu-btn">
+            <button class="mobile-toggle">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
     </nav>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-wrapper">
-        <!-- HERO SECTION -->
-        <section class="hero-section">
-            <div class="hero-content">
-                <h1 class="hero-title">🚀 Welcome to BetPro Exchange</h1>
-                <p class="hero-subtitle">Experience the thrill of live betting with the best odds across cricket, football, tennis, and more. Your winning journey starts here!</p>
-                <div class="hero-actions">
-                    <a href="/Common/BetProGames?GameId=9022" class="btn btn-white">
-                        <i class="fas fa-plane-departure"></i>
-                        Play Aviator Now
-                    </a>
-                    <a href="/Common/Sap.html" class="btn btn-outline">
-                        <i class="fas fa-book-open"></i>
-                        Explore Sportsbook
-                    </a>
-                </div>
+    <!-- HERO BANNER -->
+    <section class="hero-banner">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                DOMINATE THE <span>BETTING ARENA</span>
+            </h1>
+            <p class="hero-subtitle">
+                Experience live betting like never before. Best odds, instant payouts, and thrilling action across all major sports.
+            </p>
+            <div class="hero-actions">
+                <a href="/Common/BetProGames?GameId=9022" class="btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Play Aviator
+                </a>
+                <a href="/Common/Sap.html" class="btn-secondary">
+                    <i class="fas fa-trophy"></i>
+                    Sportsbook
+                </a>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- STATS SECTION -->
-        <div class="stats-grid">
-            <div class="stat-card">
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+        <div class="stats-container">
+            <div class="stat-box">
                 <div class="stat-icon">
                     <i class="fas fa-broadcast-tower"></i>
                 </div>
-                <div class="stat-label">Live Matches</div>
                 <div class="stat-value" id="totalInPlayCount">0</div>
-                <div class="stat-change">
-                    <i class="fas fa-circle"></i> Broadcasting now
-                </div>
+                <div class="stat-label">Live Now</div>
             </div>
-
-            <div class="stat-card">
+            <div class="stat-box">
                 <div class="stat-icon">
                     <i class="fas fa-wallet"></i>
                 </div>
-                <div class="stat-label">Your Balance</div>
                 <div class="stat-value user-balance">-</div>
-                <div class="stat-change">
-                    Available to bet
-                </div>
+                <div class="stat-label">Balance</div>
             </div>
-
-            <div class="stat-card">
+            <div class="stat-box">
                 <div class="stat-icon">
                     <i class="fas fa-ticket-alt"></i>
                 </div>
-                <div class="stat-label">Active Bets</div>
                 <div class="stat-value user-bets">0</div>
-                <div class="stat-change">
-                    Currently running
-                </div>
+                <div class="stat-label">Active Bets</div>
             </div>
-
-            <div class="stat-card">
+            <div class="stat-box">
                 <div class="stat-icon">
-                    <i class="fas fa-fire-flame-curved"></i>
+                    <i class="fas fa-calendar-day"></i>
                 </div>
-                <div class="stat-label">Today's Action</div>
                 <div class="stat-value" id="todayMatches">0</div>
-                <div class="stat-change">
-                    <i class="fas fa-arrow-trend-up"></i> Total events
-                </div>
+                <div class="stat-label">Today's Events</div>
             </div>
         </div>
+    </div>
 
-        <!-- SPORTS TABS -->
-        <div class="tabs-nav">
-            <button class="tab-btn active" onclick="switchSport('cricket')">
-                <i class="fas fa-baseball-ball"></i> Cricket
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- SPORT TABS -->
+        <div class="sport-tabs">
+            <button class="sport-tab active" onclick="switchSport('cricket')">
+                <i class="fas fa-baseball-ball"></i>
+                <span>Cricket</span>
                 <span class="tab-badge" id="cricketBadge">0</span>
             </button>
-            <button class="tab-btn" onclick="switchSport('football')">
-                <i class="fas fa-futbol"></i> Football
+            <button class="sport-tab" onclick="switchSport('football')">
+                <i class="fas fa-futbol"></i>
+                <span>Football</span>
                 <span class="tab-badge" id="footballBadge">0</span>
             </button>
-            <button class="tab-btn" onclick="switchSport('tennis')">
-                <i class="fas fa-table-tennis-paddle-ball"></i> Tennis
+            <button class="sport-tab" onclick="switchSport('tennis')">
+                <i class="fas fa-table-tennis-paddle-ball"></i>
+                <span>Tennis</span>
                 <span class="tab-badge" id="tennisBadge">0</span>
             </button>
-            <button class="tab-btn" onclick="switchSport('horse')">
-                <i class="fas fa-horse"></i> Horse Racing
+            <button class="sport-tab" onclick="switchSport('horse')">
+                <i class="fas fa-horse"></i>
+                <span>Horse Racing</span>
             </button>
-            <button class="tab-btn" onclick="switchSport('greyhound')">
-                <i class="fas fa-dog"></i> Greyhound
+            <button class="sport-tab" onclick="switchSport('greyhound')">
+                <i class="fas fa-dog"></i>
+                <span>Greyhound</span>
             </button>
-            <button class="tab-btn" onclick="switchSport('casino')">
-                <i class="fas fa-dice"></i> Casino
+            <button class="sport-tab" onclick="switchSport('casino')">
+                <i class="fas fa-dice"></i>
+                <span>Casino</span>
             </button>
         </div>
 
         <!-- CRICKET SECTION -->
         <div id="cricket-section">
-            <h2 class="section-title">
-                <span class="live-dot"></span>
-                Cricket Matches
-            </h2>
-            <div class="matches-container" id="cricket-matches">
+            <div class="section-header">
+                <h2 class="section-title">
+                    Cricket Matches
+                    <span class="live-indicator">
+                        <span class="live-dot"></span>
+                        Live
+                    </span>
+                </h2>
+            </div>
+            <div class="matches-grid" id="cricket-matches">
                 <div class="loading"><div class="spinner"></div></div>
             </div>
         </div>
 
         <!-- FOOTBALL SECTION -->
         <div id="football-section" class="hidden">
-            <h2 class="section-title">
-                <span class="live-dot"></span>
-                Football Matches
-            </h2>
-            <div class="matches-container" id="football-matches">
+            <div class="section-header">
+                <h2 class="section-title">
+                    Football Matches
+                    <span class="live-indicator">
+                        <span class="live-dot"></span>
+                        Live
+                    </span>
+                </h2>
+            </div>
+            <div class="matches-grid" id="football-matches">
                 <div class="loading"><div class="spinner"></div></div>
             </div>
         </div>
 
         <!-- TENNIS SECTION -->
         <div id="tennis-section" class="hidden">
-            <h2 class="section-title">
-                <span class="live-dot"></span>
-                Tennis Matches
-            </h2>
-            <div class="matches-container" id="tennis-matches">
+            <div class="section-header">
+                <h2 class="section-title">
+                    Tennis Matches
+                    <span class="live-indicator">
+                        <span class="live-dot"></span>
+                        Live
+                    </span>
+                </h2>
+            </div>
+            <div class="matches-grid" id="tennis-matches">
                 <div class="loading"><div class="spinner"></div></div>
             </div>
         </div>
 
-        <!-- HORSE RACING -->
+        <!-- HORSE RACING SECTION -->
         <div id="horse-section" class="hidden">
-            <h2 class="section-title">
-                <i class="fas fa-flag-checkered"></i>
-                Horse Racing
-            </h2>
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-flag-checkered"></i>
+                    Horse Racing
+                </h2>
+            </div>
             <div class="race-list" id="horse-races">
                 <div class="loading"><div class="spinner"></div></div>
             </div>
         </div>
 
-        <!-- GREYHOUND -->
+        <!-- GREYHOUND SECTION -->
         <div id="greyhound-section" class="hidden">
-            <h2 class="section-title">
-                <i class="fas fa-flag-checkered"></i>
-                Greyhound Racing
-            </h2>
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-flag-checkered"></i>
+                    Greyhound Racing
+                </h2>
+            </div>
             <div class="race-list" id="greyhound-races">
                 <div class="loading"><div class="spinner"></div></div>
             </div>
@@ -1196,13 +1353,15 @@
 
         <!-- CASINO SECTION -->
         <div id="casino-section" class="hidden">
-            <h2 class="section-title">
-                <i class="fas fa-fire"></i>
-                Featured Casino Games
-            </h2>
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-fire"></i>
+                    Featured Casino Games
+                </h2>
+            </div>
             <div class="casino-grid" id="casino-games"></div>
         </div>
-    </div>
+    </main>
 
     <!-- FOOTER -->
     <footer class="footer">
@@ -1308,33 +1467,31 @@
             return `
                 <div class="match-card" onclick="window.location.href='/Common/Market.html?id=${match.marketId}'">
                     <div class="match-header">
-                        <div class="match-time-info">
-                            <div class="match-time">
-                                <i class="far fa-clock"></i>
-                                ${time}
-                            </div>
+                        <div class="match-time">
+                            <i class="far fa-clock"></i>
+                            ${time}
                         </div>
                         <span class="match-status ${status}">${status}</span>
                     </div>
                     
                     <div class="match-name">${match.match}</div>
                     
-                    <div class="match-meta">
-                        <div class="meta-item">
+                    <div class="match-info">
+                        <div class="info-item">
                             <i class="fas fa-chart-bar"></i>
                             <span>${match.totalMatched || '0'}</span>
                         </div>
                     </div>
                     
-                    <div class="odds-container">
+                    <div class="odds-grid">
                         <div class="odds-team">
                             <div class="odds-team-name">Team 1</div>
-                            <div class="odds-row">
-                                <div class="odd-box back">
+                            <div class="odds-buttons">
+                                <div class="odd-btn back">
                                     <div class="odd-price">${match.odds.back1.price}</div>
                                     <div class="odd-size">${match.odds.back1.size}</div>
                                 </div>
-                                <div class="odd-box lay">
+                                <div class="odd-btn lay">
                                     <div class="odd-price">${match.odds.lay1.price}</div>
                                     <div class="odd-size">${match.odds.lay1.size}</div>
                                 </div>
@@ -1343,12 +1500,12 @@
                         ${match.odds.backX && match.odds.backX.price !== 'x' ? `
                         <div class="odds-team">
                             <div class="odds-team-name">Draw</div>
-                            <div class="odds-row">
-                                <div class="odd-box back">
+                            <div class="odds-buttons">
+                                <div class="odd-btn back">
                                     <div class="odd-price">${match.odds.backX.price}</div>
                                     <div class="odd-size">${match.odds.backX.size}</div>
                                 </div>
-                                <div class="odd-box lay">
+                                <div class="odd-btn lay">
                                     <div class="odd-price">${match.odds.layX.price}</div>
                                     <div class="odd-size">${match.odds.layX.size}</div>
                                 </div>
@@ -1357,12 +1514,12 @@
                         ` : ''}
                         <div class="odds-team">
                             <div class="odds-team-name">Team 2</div>
-                            <div class="odds-row">
-                                <div class="odd-box back">
+                            <div class="odds-buttons">
+                                <div class="odd-btn back">
                                     <div class="odd-price">${match.odds.back2.price}</div>
                                     <div class="odd-size">${match.odds.back2.size}</div>
                                 </div>
-                                <div class="odd-box lay">
+                                <div class="odd-btn lay">
                                     <div class="odd-price">${match.odds.lay2.price}</div>
                                     <div class="odd-size">${match.odds.lay2.size}</div>
                                 </div>
@@ -1399,14 +1556,14 @@
                     });
                 }
                 
-                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:3rem;">No cricket matches available right now</p>';
+                container.innerHTML = html || '<p style="text-align:center; color:var(--text-secondary); padding:3rem;">No cricket matches available</p>';
                 
                 const count = (inplayData.markets?.length || 0) + (liveData.data?.length || 0);
                 document.getElementById('cricketBadge').textContent = count;
                 updateTotalCount();
             } catch (err) {
                 console.error('Error:', err);
-                document.getElementById('cricket-matches').innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:3rem;">Failed to load matches</p>';
+                document.getElementById('cricket-matches').innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:3rem;">Failed to load</p>';
             }
         }
 
@@ -1495,8 +1652,8 @@
                     data.data.forEach(race => {
                         const time = formatTime(race.startTime);
                         html += `
-                            <div class="race-card" onclick="window.location.href='/Common/Market.html?id=${race.marketId}'">
-                                <div class="race-info">
+                            <div class="race-item" onclick="window.location.href='/Common/Market.html?id=${race.marketId}'">
+                                <div class="race-details">
                                     <div class="race-time">${time}</div>
                                     <div class="race-name">${race.match}</div>
                                 </div>
@@ -1525,8 +1682,8 @@
                     data.data.forEach(race => {
                         const time = formatTime(race.startTime);
                         html += `
-                            <div class="race-card" onclick="window.location.href='/Common/Market.html?id=${race.marketId}'">
-                                <div class="race-info">
+                            <div class="race-item" onclick="window.location.href='/Common/Market.html?id=${race.marketId}'">
+                                <div class="race-details">
                                     <div class="race-time">${time}</div>
                                     <div class="race-name">${race.match}</div>
                                 </div>
@@ -1557,10 +1714,11 @@
             
             const container = document.getElementById('casino-games');
             container.innerHTML = games.map(game => `
-                <a href="${game.url}" class="casino-card">
+                <a href="${game.url}" class="casino-item">
                     <img src="${game.img}" alt="${game.name}" onerror="this.src='/img/favicon/BetPro.ico'">
-                    <div class="casino-overlay">
-                        <div class="casino-name">${game.name}</div>
+                    <div class="casino-name">
+                        <h3>${game.name}</h3>
+                        <span class="btn-primary">Play Now</span>
                     </div>
                 </a>
             `).join('');
@@ -1570,8 +1728,8 @@
         function switchSport(sport) {
             currentSport = sport;
             
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.sport-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.sport-tab').classList.add('active');
             
             document.querySelectorAll('[id$="-section"]').forEach(section => section.classList.add('hidden'));
             document.getElementById(`${sport}-section`).classList.remove('hidden');
@@ -1590,13 +1748,13 @@
             document.getElementById('todayMatches').textContent = cricket + football + tennis;
         }
 
-        // TOGGLE DROPDOWN
-        function toggleDropdown() {
+        // TOGGLE USER MENU
+        function toggleUserMenu() {
             document.getElementById('user-dropdown').classList.toggle('active');
         }
 
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.user-profile')) {
+            if (!e.target.closest('.user-menu')) {
                 document.getElementById('user-dropdown').classList.remove('active');
             }
         });
